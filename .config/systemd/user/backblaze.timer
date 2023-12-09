@@ -1,0 +1,9 @@
+[Unit]
+Description=Timer to upload backups to backblaze
+
+[Timer]
+OnCalendar=*-*-* 19:23:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

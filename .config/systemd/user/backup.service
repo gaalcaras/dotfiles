@@ -1,0 +1,13 @@
+[Unit]
+Description=Backup
+After=network.target run-media-gaalcaras-batbackup.mount
+ConditionPathExistsGlob=/home/gaalcaras/.local/bin/user/utils/backup
+ConditionPathExistsGlob=/home/gaalcaras/.local/bin/user/utils/backup.txt
+ConditionPathExistsGlob=/run/media/gaalcaras/batbackup/batcave
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/user/utils/backup
+
+[Install]
+Also=backup.timer

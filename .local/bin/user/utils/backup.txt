@@ -1,0 +1,8 @@
++ /organiser
++ /chercher
++ /enseigner
++ /.dotfiles
++ /.config/buku_run
++ /.config/qutebrowser
++ /.email
+- /*

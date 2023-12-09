@@ -1,0 +1,12 @@
+[Unit]
+Description=Backblaze
+After=network.target run-media-gaalcaras-batbackup.mount backup.service
+ConditionPathExistsGlob=/home/gaalcaras/.local/bin/user/utils/backblaze
+ConditionPathExistsGlob=/run/media/gaalcaras/batbackup/batcave
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/user/utils/backblaze
+
+[Install]
+Also=backblaze.timer

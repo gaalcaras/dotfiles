@@ -1,0 +1,33 @@
+#!/bin/bash
+
+export PASSPHRASE="$(pass credentials/backblaze/pp)"
+LOGDIR="/home/gaalcaras/.local/share/backblaze"
+LOGFILE="/$LOGDIR/$(date +"%Y-%m-%d-%H-%M-%S")-backblaze.log"
+BACKUP_DRIVE="/run/media/gaalcaras/batbackup"
+touch "$LOGFILE"
+ln --force "$LOGFILE" "/$LOGDIR/backblaze_latest.log"
+
+# Backup script
+b2backup() {
+  local l_dir
+  l_dir="$(readlink -f "$1"/latest)"
+  local r_dir="$2"
+
+  b2=$(pass show credentials/backblaze/b2)
+  duplicity incr "$l_dir" "$b2/$r_dir" \
+    --allow-source-mismatch \
+    --verbosity info \
+    --log-file "$LOGFILE"
+}
+
+# Clear old logs
+find $LOGDIR/* -mtime +5 -exec rm {} \;
+
+# Find backup directories
+LOCAL_DIRS=$(find "$BACKUP_DRIVE" -maxdepth 3 -type f -name 'backup.marker' | sed -r 's|/[^/]+$||' |sort |uniq)
+
+for local_dir in $LOCAL_DIRS
+do
+  remote_dir=${local_dir#"$BACKUP_DRIVE"}
+  b2backup "$local_dir" "$remote_dir"
+done

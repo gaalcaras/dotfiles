@@ -1,0 +1,3 @@
+#! /bin/bash
+
+rsync_tmbackup.sh --rsync-set-flags "-D --numeric-ids --copy-links --keep-dirlinks --itemize-changes --times --recursive --perms --owner --group --stats --human-readable" /home/gaalcaras/ "/run/media/gaalcaras/batbackup/batcave/home" /home/gaalcaras/.local/bin/user/utils/backup.txt
