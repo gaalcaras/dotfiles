@@ -1,0 +1,47 @@
+# Local/private config goes in the include
+[include]
+  path = ~/.gitconfig.local
+[hub]
+  protocol = ssh
+[alias]
+  c  = commit --verbose
+  d  = difftool -y
+  co = checkout
+  br = branch
+  st = status -sb
+[merge]
+  tool = nvimdiff4
+[mergetool "nvimdiff4"]
+  cmd = nvim -d $LOCAL $BASE $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
+[diff]
+  tool = nvimdiff2
+[difftool "nvimdiff2"]
+  cmd = nvim -d $LOCAL $REMOTE
+[color]
+  diff = auto
+  status = auto
+  branch = auto
+  ui = true
+[core]
+  excludesfile = ~/.gitignore
+  editor = nvim
+[help]
+  autocorrect = 1
+[push]
+  default = simple
+[filter "contextignore"]
+  clean = sed '/^context=/'d
+  smudge = cat
+[filter "minvimrc"]
+  clean = sed "/ENDMINVIMRC/Q"
+  smudge = cat
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+[user]
+	email = batmail+github@posteo.net
+	name = gaalcaras
+[credential]
+	helper = cache
