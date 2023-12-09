@@ -1,5 +1,0 @@
-video/*; mpv '%s'; print=mpv --aid=no --vid=no --sid=no '%s' || : ;
-audio/*; mpv '%s'; print=mpv --aid=no --vid=no --sid=no '%s' || : ;
-application/json; $EDITOR '%s'; needsterminal; print=highlight '%s';
-application/octet-stream; $EDITOR '%s'; needsterminal; print=highlight '%s';
-text/*; $EDITOR %s; needsterminal; print=cat '%s';
