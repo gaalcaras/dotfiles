@@ -1,0 +1,346 @@
+# ##############
+# MUTTRC
+# ##############
+
+# ACCOUNTS {{{
+
+# Offlineimap downloads email there:
+set folder=~/.email/
+
+# Email adresses
+set my_gmail_em=`pass show email/gmail.com/user`
+set my_ehess_em=`pass show email/ehess.fr/user`
+set my_eiffel_em=`pass show email/eiffel/from`
+set my_posteo_em=`pass show email/posteo/user`
+
+# Noms et emails
+set my_name="Gabriel Alcaras"
+set use_from=yes
+alternates $my_gmail_em|$my_ehess_em|$my_posteo_em|$my_eiffel_em
+
+# Notmuch setup
+set virtual_spoolfile=yes
+set nm_default_url="notmuch://$HOME/.email"
+set nm_record=yes # share records (sent emails) with neomutt
+set nm_record_tags="-unread,-inbox,sent" # tags matching sent emails
+
+# Config files
+folder-hook posteo* 'source ~/.config/neomutt/posteo'
+folder-hook ehess* 'source ~/.config/neomutt/ehess'
+folder-hook gmail* 'source ~/.config/neomutt/gmail'
+folder-hook eiffel* 'source ~/.config/neomutt/eiffel'
+
+set mailcap_path = ~/.config/neomutt/mailcap
+
+# }}}
+
+# GENERAL PARAMETERS  {{{
+set realname = "Gabriel Alcaras"
+
+# Threads
+set sort="threads"
+set use_threads="yes"
+set strict_threads="yes"
+set sort_browser="reverse-date"
+set sort_aux="reverse-last-date-received"
+set uncollapse_jump # Go to next unread message when thread uncollapsed
+
+set auto_tag=yes
+set include=yes # Include a copy of the message when replying
+set copy=yes # Copy sent mail to Sent folder
+set delete=yes # Just delete it
+unset confirmappend # Just append messages to folder
+set quit=ask-yes
+set postpone=ask-yes
+
+# Wrap emails in pager
+set text_flowed
+set smart_wrap
+set wrap=80
+set markers = no # Do not prefix wrapped lines with a "+" sign
+
+# Pager
+set pager="builtin"
+set pager_context=5 # 5 lines of overlap when scrolling up or down
+set pager_stop
+set pager_index_lines = 15 # Show index lines in pager
+
+# Pager Headers
+ignore *
+unignore date from to cc subject x-mailer
+unhdr_order *
+hdr_order Date: From: Subject: To: Cc: X-Mailer:
+
+# Collapse all threads on open
+# folder-hook . "exec collapse-all"
+set collapse_all = yes
+set uncollapse_new = yes
+folder-hook . "exec first-entry"
+
+# Fix attachment names
+set rfc2047_parameters=yes
+
+# Don't forget attachment
+set abort_noattach="ask-yes"
+set abort_noattach_regex= "\\<(attach(é|ed|ments?)|PJ|(pièce|ci)( |-)joint|joins)\\>"
+
+# Count attachments
+attachments   +A */.*
+attachments   -A message/external-body
+attachments   -I message/external-body
+
+# Locale
+set send_charset="utf-8"
+set date_format="%m/%d %H:%M"
+
+# Vim, of course
+set editor="nvim"
+
+# Khard
+set query_command= "khard email --parsable %s"
+
+auto_view text/html # View html emails
+alternative_order text/plain text/enriched text/html
+auto_view application/pdf
+
+# Sidebar
+set sidebar_visible=no
+
+# Use %D instead of %B to properly display virtual mailboxes
+set sidebar_format="%D%> %?N?%N/?%?S?%S&?"
+
+set mail_check_stats # Refresh mailbox stats on sync
+set sidebar_divider_char = " │ "
+
+# Index setup
+
+# Customize status flags with symbols and emojis
+# https://neomutt.org/guide/reference.html#to-chars
+# set to_chars=" @TCFL"
+set to_chars=" @TCFL"
+set flag_chars="*!D ✔····  "
+
+# Set $index_format
+# https://www.neomutt.org/guide/reference.html#index-format
+# Conditional formatting : %<TEST? TRUE & FALSE >
+
+# Date
+index-format-hook  date  "~d<1d"    "%[%H:%M]"
+index-format-hook  date  "~d<1m"    "%[%a %d]"
+index-format-hook  date  "~d<1y"    "%[%b %d]"
+index-format-hook  date  "~A"       "%[%m/%y]"
+
+set my_attachment_indicator="%?X? &?"
+set my_index_author="%-25.25L"
+set my_index_threadcount="%<M?[%-1.2M]&%<E? %-1.2e &    >>"
+set my_index_tags = "%<g?[%g]&>"
+
+set index_format="%zs%zt %-7.7@date@ $my_index_author $my_index_threadcount $my_attachment_indicator%s $my_index_tags"
+# }}}
+
+# COLORS {{{
+
+set color_directcolor
+
+source ~/.config/neomutt/colors
+
+# }}}
+
+# BINDINGS {{{
+
+# Allow use of space in editor ()
+bind editor <space> noop
+
+# Tag / Select emails in index and pager
+bind index,pager <space> noop
+bind index <space> tag-thread
+macro pager <space> "q<tag-thread>"
+bind index \Ca tag-pattern
+
+# Display the entire thread to which the message belongs (notmuch)
+bind index,pager i noop
+bind index,pager i entire-thread
+
+# NAVIGATION BINDINGS
+
+bind index,pager,attach s noop
+bind index,pager,attach s previous-entry
+
+bind index,pager,attach t noop
+bind index,pager,attach t next-entry
+
+bind index,pager } noop
+bind index,pager } next-thread
+
+bind index,pager { noop
+bind index,pager { previous-thread
+
+bind index,pager \Cf next-page
+bind index,pager \Cb previous-page
+
+bind index,pager G noop
+bind index G last-entry
+bind pager G bottom
+
+bind index,pager g noop
+bind index gg first-entry
+bind pager gg top
+
+# Ctrl+P, Ctrl+N
+bind index,pager \CP sidebar-prev
+bind index,pager \CN sidebar-next
+bind index,pager \CO sidebar-open
+bind browser,attach \CP previous-entry
+bind browser,attach \CN next-entry
+
+bind index,pager z noop
+bind index zC collapse-all
+macro pager zC 'qzC'
+bind index zc collapse-thread
+bind index zz collapse-thread
+bind index zo collapse-thread
+macro pager zc 'qzc'
+
+# Reply to message, reply to sender
+bind index,pager R noop
+bind index,pager R group-reply
+
+bind index,pager @ noop
+bind index,pager @ compose-to-sender
+
+# Open attachment with mailcap
+bind attach <return> noop
+bind attach <return> view-mailcap
+
+bind index,pager V noop
+# macro pager V "<enter-command>unset wait\_key<enter>v/html\n\n<enter-command>set wait\_key<enter>q"
+# macro index V "<enter-command>unset wait\_key<enter><enter>v/html\n\n<enter-command>set wait\_key<enter>qq"
+macro index,pager V "<view-attachments><search>html<enter><view-mailcap>"
+
+# Modify labels / tags (notmuch)
+bind index,pager Y noop
+bind index,pager Y modify-labels
+
+# Delete all messages matching a pattern
+bind index D noop
+bind index D delete-pattern
+
+# Khard
+bind editor <Tab> noop
+bind editor <Tab> complete-query
+
+bind editor <Backtab> noop
+bind editor <Backtab> complete
+
+bind  index,pager A noop
+macro index,pager A "<pipe-message>khard add-email<return>" "add the sender email address to khard"
+
+# Sidebar
+bind index,pager,attach '~' noop
+macro index,pager,attach '~' '<enter-command>toggle sidebar_visible<enter>'
+
+# Global search (all accounts) using notmuch
+bind index % noop
+macro index % "<vfolder-from-query>"
+
+# Send email later
+bind  compose Y noop
+macro compose Y "<shell-escape>email-send-later<enter><send-message><enter>" 'Send email at a later date'
+
+# Some really cool piping hacks
+set my_pipe_start = "<enter-command>unset wait\_key<enter><pipe-message>"
+set my_pipe_end = "<enter><enter-command>source /tmp/neomutt_filter<enter><enter-command>push ..<enter><enter-command>set wait\_key<enter>"
+
+# Unsubscribe
+bind  index,pager U noop
+macro index,pager U "$my_pipe_start unsubscribe.py $my_pipe_end" 'Unsubscribe from newsletter or mailing list'
+
+# Quick limit macros (index)
+bind  index ,  noop
+macro index ,f "$my_pipe_start mutt_get_sender.py $my_pipe_end" 'Filter to same sender'
+macro index ,l "<limit>~s[[]|(%L lists)<enter>zC" 'Limit to mailing lists'
+macro index ,m "<limit>~p!~F!(%L lists)<enter>zC" 'Limit to direct emails'
+macro index ,r "<limit>~sCR-RESET<enter>zC" 'Limit to RESET mailing list'
+bind  index  ,t limit-current-thread
+
+# Quick limit macros (same, but for the pager)
+bind  pager ,  noop
+macro pager ,t "q<limit-current-thread>" "Limit to current thread"
+macro pager ,f "q,f<enter>" "Filter to same sender"
+macro pager ,l "q,l<enter>" "Limit to mailing lists"
+macro pager ,m "q,m<enter>" "Limit to direct emails"
+macro pager ,r "q,r<enter>" "Limit to current thread"
+
+# Clear selection
+macro index,pager ,a  "<limit>all<enter>zC" 'Reset limits to see all emails in folder'
+macro index       \Cl "<untag-pattern><enter>" 'Clear selected / tagged emails'
+
+# Reload muttrc
+macro index,pager,attach \cr '<enter-command>source ~/.config/neomutt/muttrc<enter>' 'Reload muttrc'
+
+# Reload colorscheme
+bind index,pager,attach w noop
+macro index,pager,attach w '<enter-command>source ~/.config/neomutt/colors<enter>' 'Reload colorscheme'
+
+# Display links in email
+macro pager,attach,compose \Cl "<enter-command>unset wait\_key<enter><pipe-entry>urlscan -d<enter><enter-command>set wait\_key<enter>" 'Follow links with urlscan'
+
+# Save attachments
+macro index,pager X "<pipe-message>~/.dotfiles/bin/mutt/save_all_attachments.py<enter>" 'Save all attachments to proper directory structure'
+# bind  attach S noop
+# macro attach S "<enter-command>unset wait\_key<enter><print-entry><enter-command>set wait\_key<enter>" 'Save attachment to dated directory'
+
+unbind editor <space>
+bind compose a noop
+macro compose a ":source ~/.dotfiles/bin/mutt/fzfattach|<enter>" 'Add attachment using fzf'
+macro compose <space>a '<attach-file>' 'Add attachment'
+
+# Send and sync emails
+bind  index,pager .  noop
+macro index,pager .l '<shell-escape>clear && msmtp-listqueue<enter>' 'List emails in queue'
+macro index,pager .r '<shell-escape>clear && msmtp-runqueue -f<enter>' 'Send emails in queue'
+macro index,pager .u '<shell-escape>clear && rm ~/.msmtpqueue/.lock<enter>' 'Unlock msmtpqueue'
+
+# Switch between mailboxes
+bind index,pager <F1> noop
+bind index,pager <F2> noop
+bind index,pager <F3> noop
+bind index,pager <F4> noop
+
+macro index,pager <F1> '<enter-command>source ~/.config/neomutt/posteo<enter>~<sidebar-page-up><sidebar-open>~' 'Go to Posteo inbox'
+macro index,pager <F4> '<enter-command>source ~/.config/neomutt/ehess<enter>~<sidebar-page-up><sidebar-open>~' ' Go to EHESS inbox'
+macro index,pager <F3> '<enter-command>source ~/.config/neomutt/gmail<enter>~<sidebar-page-up><sidebar-open>~' 'Go to Gmail inbox'
+macro index,pager <F2> '<enter-command>source ~/.config/neomutt/eiffel<enter>~<sidebar-page-up><sidebar-open>~' ' Go to EIFFEL inbox'
+
+# Move emails between mailboxes
+bind index,pager c noop
+
+macro index,pager cgg "<enter-command>push <save-message>+gmail/\n\t\t" "Prompt to choose gmail folder to move the message to"
+macro index,pager cgi '<save-message>+gmail/inbox<enter><enter-command>echo "Moved message to gmail inbox"<enter>' "Move message to gmail inbox"
+macro index,pager cga '<save-message>+gmail/archives<enter><enter-command>echo "Moved message to gmail archive"<enter>' "Move message to gmail archive"
+macro index,pager cgs '<save-message>+gmail/bak.sent<enter><enter-command>echo "Moved message to gmail sent"<enter>' "Move message to gmail sent"
+
+macro index,pager cee "<enter-command>push <save-message>+ehess/\n\t\t" "Prompt to choose ehess folder to move the message to"
+macro index,pager cei '<save-message>+ehess/inbox<enter><enter-command>echo "Moved message to ehess inbox"<enter>' "Move message to ehess inbox"
+macro index,pager cea '<save-message>+ehess/archives<enter><enter-command>echo "Moved message to ehess archive"<enter>' "Move message to ehess archive"
+macro index,pager ces '<save-message>+ehess/sent<enter><enter-command>echo "Moved message to ehess sent"<enter>' "Move message to ehess sent"
+
+macro index,pager cpp "<enter-command>push <save-message>+posteo/\n\t\t" "Prompt to choose posteo folder to move the message to"
+macro index,pager cpi '<save-message>+posteo/inbox<enter><enter-command>echo "Moved message to posteo inbox"<enter>' "Move message to posteo inbox"
+macro index,pager cpa '<save-message>+posteo/archives<enter><enter-command>echo "Moved message to posteo archive"<enter>' "Move message to posteo archive"
+macro index,pager cps '<save-message>+posteo/sent<enter><enter-command>echo "Moved message to posteo sent"<enter>' "Move message to posteo sent"
+
+macro index,pager cue "<enter-command>push <save-message>+eiffel/\n\t\t" "Prompt to choose eiffel folder to move the message to"
+macro index,pager cui '<save-message>+eiffel/inbox<enter><enter-command>echo "Moved message to eiffel inbox"<enter>' "Move message to eiffel inbox"
+macro index,pager cua '<save-message>+eiffel/archives<enter><enter-command>echo "Moved message to eiffel archive"<enter>' "Move message to eiffel archive"
+macro index,pager cus '<save-message>+eiffel/sent<enter><enter-command>echo "Moved message to eiffel sent"<enter>' "Move message to eiffel sent"
+
+# }}}
+
+# Load default mailbox
+source ~/.config/neomutt/posteo
+
+# Retired setting, ideas and macros
+# source ~/.config/neomutt/retired
+
+# vim: set ft=neomuttrc:

@@ -1,0 +1,18 @@
+# ==== Gmail configuration ====
+
+# ---- Change these variables ----
+set my_account = "gmail"
+set my_email = $my_gmail_em
+set my_smtp_login = $my_gmail_em
+
+set my_drafts = "bak.drafts"
+set my_sent = "bak.sent"
+set my_trash = "bak.trash"
+
+# IMAP folders to scan quickly
+set my_quick_scan = "INBOX"
+
+# ---- Config mailbox ----
+source ~/.config/neomutt/mailbox
+
+# vim: set ft=neomuttrc:

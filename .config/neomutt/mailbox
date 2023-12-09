@@ -1,0 +1,126 @@
+# === general mailbox configuration ====
+
+# when setting up another mailbox, change these variables
+# set my_account =
+# set my_email = $my_posteo_em
+# set my_smtp_login = $my_posteo_em
+
+# set my_drafts = "drafts"
+# set my_sent = "sent"
+# set my_trash = "trash"
+
+# imap folders to scan quickly
+# set my_quick_scan = "inbox"
+
+# --- some additional variables ---
+set my_local = "folder:/$my_account/ and "
+
+# account folders
+set my_mailbox_inbox = "+$my_account/inbox"
+set my_mailbox_archives = "+$my_account/archives"
+set my_mailbox_drafts = "+$my_account/$my_drafts"
+set my_mailbox_sent = "+$my_account/$my_sent"
+set my_mailbox_trash = "+$my_account/$my_trash"
+
+# tags pairing
+set my_tag_archive   = "+archive -inbox -blackhole -today -later -trash -unread"
+set my_tag_inbox     = "-archive +inbox -blackhole -today -later -trash"
+set my_tag_blackhole = "-archive -inbox +blackhole -today -later -trash"
+set my_tag_today     = "-archive -inbox -blackhole +today -later -trash"
+set my_tag_later     = "-archive -inbox -blackhole -today +later -trash"
+set my_tag_trash     = "-archive -inbox -blackhole -today -later +trash -unread"
+
+# notmuch virtual mailboxes
+set my_local_vmbox = "notmuch://?query=$my_local"
+
+# --- status bar ---
+set status_format = "─%>──[ $my_account / %f ]───[%r%m messages%?n? (%n new)?%?d? (%d to delete)?%?t? (%t tagged)? ]───%?p?( %p postponed )?───"
+
+# --- setup cache ---
+set header_cache = "~/.cache/mutt/$my_account/headers"
+set message_cachedir = "~/.cache/mutt/$my_account/messages"
+
+# --- setup account folders ---
+set spoolfile="$my_mailbox_inbox"
+set record="$my_mailbox_sent"
+set postponed="$my_mailbox_drafts"
+set mbox="$my_mailbox_drafts"
+set trash="$my_mailbox_trash"
+
+# --- setup smtp ---
+set sendmail="msmtp-enqueue -a $my_account "
+set from="$my_name <$my_email>"
+
+# --- setup mailboxes ---
+
+unmailboxes * # clean all mailboxes
+
+set my_vip_inbox = "$my_local_vmbox tag:inbox and not tag:archive"
+
+virtual-mailboxes "vip"              "$my_local_vmbox tag:inbox and not tag:archive" \
+                  "blackhole"        "$my_local_vmbox tag:blackhole" \
+                  "unprocessed"      "$my_local_vmbox not tag:inbox and not tag:blackhole and not tag:trash" \
+                  " "                "$my_local_vmbox tag:fake-tag3" \
+                  "answer today"     "$my_local_vmbox tag:today"\
+                  "answer later"     "$my_local_vmbox tag:later"\
+                  " "                "$my_local_vmbox tag:fake-tag1" \
+                  "all"              "$my_local_vmbox tag:archive tag:sent" \
+                  "  archive"        "$my_local_vmbox tag:archive" \
+                  "  sent"           "$my_local_vmbox tag:sent" \
+                  "  flagged"        "$my_local_vmbox tag:flagged" \
+                  " "                "$my_local_vmbox tag:fake-tag2" \
+                  "deleted"          "$my_local_vmbox tag:trash"
+
+# --- setup macros ---
+
+# local search macro
+bind  index / noop
+macro index / "<vfolder-from-query>$my_local"
+
+# moving to (v)folders
+macro index,pager gi "<change-vfolder>vip<enter>" "go to inbox"
+macro index,pager gb "<change-vfolder>blackhole<enter>" "go to blackhole"
+macro index,pager gu "<change-vfolder>unprocessed<enter>" "go to all other unprocessed emails"
+
+macro index,pager gt "<change-vfolder>answer today<enter>" "go to 'answer today'"
+macro index,pager gl "<change-vfolder>answer later<enter>" "go to 'answer later'"
+
+macro index,pager ga "<change-vfolder>all<enter>" "go to archived mail"
+macro index,pager gf "<change-vfolder>  flagged<enter>" "Go to starred / flagged mail"
+macro index,pager g! "<change-vfolder>  flagged<enter>" "Go to starred / flagged mail"
+macro index,pager gs "<change-vfolder>  sent<enter>" "Go to sent mail"
+
+macro index,pager gd "<change-vfolder>deleted<enter>" "Go to deleted / trashed mail"
+
+# Scanning inbox
+macro index,pager .S "<enter-command>unset wait_key<enter><shell-escape>clear && offlineimap -o -a $my_account -q -f $my_quick_scan<enter><enter-command>set wait_key<enter>" 'Sync inbox'
+macro index,pager .s "<enter-command>unset wait_key<enter><shell-escape>clear && offlineimap -o -a $my_account -q<enter><enter-command>set wait_key<enter>" 'Sync everything'
+
+# Moving messages around
+bind  index,pager a noop
+macro index a "<tag-thread><save-message>$my_mailbox_archives<enter>s<tag-thread><modify-labels>$my_tag_archive<enter><sync-mailbox>" "Move to archives"
+macro pager a "q<save-message>$my_mailbox_archives<enter>s<modify-labels>$my_tag_archive<enter>s<enter><sync-mailbox>" "Move to archives (from pager)"
+
+bind  index,pager d noop
+macro index d "<tag-thread><delete-message>s<tag-thread><modify-labels>$my_tag_trash<enter><sync-mailbox>" "Move to trash"
+macro pager d "q<tag-thread><delete-message>s<tag-thread><modify-labels>$my_tag_trash<enter><sync-mailbox>" "Move to trash (from pager)"
+
+bind  index,pager I noop
+macro index,pager I "<tag-thread><modify-labels>$my_tag_inbox<enter>"
+
+bind  index,pager B noop
+macro index,pager B "<tag-thread><modify-labels>$my_tag_blackhole<enter>"
+
+bind  index,pager T noop
+macro index,pager T "<tag-thread><modify-labels>$my_tag_today<enter>"
+
+bind  index,pager L noop
+macro index,pager L "<tag-thread><modify-labels>$my_tag_later<enter>"
+
+bind index,pager ! noop
+macro index,pager ! "<modify-labels>+flagged<enter>" "Flag message"
+
+bind index,pager - noop
+macro index,pager - "<modify-labels>-flagged<enter>" "Unflag message"
+
+# vim: set ft=neomuttrc:

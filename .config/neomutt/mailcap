@@ -1,0 +1,25 @@
+text/html; uconv --add-signature -f %{charset} -t UTF-8 %s && qutebrowser %s; needsterminal; nametemplate=%s.html;
+text/html; w3m -I %{charset} -T text/html; copiousoutput; print=mutt_save_attachment %s;
+text/plain; nvim %s; print=mutt_save_attachment %s;
+text/csv; scim %s; print=mutt_save_attachment %s;
+text/x-tex; nvim %s; print=mutt_save_attachment %s;
+
+application/pdf; $HOME/.config/neomutt/mutt_bg $PDFREADER %s 2>/dev/null; print=mutt_save_attachment %s;
+
+image/*; $HOME/.config/neomutt/mutt_bg feh %s; print=mutt_save_attachment %s;
+
+application/msword; /usr/bin/libreoffice --writer %s; print=mutt_save_attachment %s;
+application/applefile; /usr/bin/libreoffice --writer %s; print=mutt_save_attachment %s;
+application/vnd.ms-excel; /usr/bin/libreoffice --calc %s; print=mutt_save_attachment %s;
+application/vnd.openxmlformats-officedocument.wordprocessingml.document; /usr/bin/libreoffice --writer %s; print=mutt_save_attachment %s;
+application/vnd.oasis.opendocument.spreadsheet; /usr/bin/libreoffice --calc %s; print=mutt_save_attachment %s;
+application/oleobject; /usr/bin/libreoffice --calc %s; print=mutt_save_attachment %s;
+application/vnd.oasis.opendocument.text; /usr/bin/libreoffice --writer %s; print=mutt_save_attachment %s;
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; /usr/bin/libreoffice --calc %s; print=mutt_save_attachment %s;
+
+application/ics; khal import -a rdv %s;
+
+application/octet-stream; nvim %s; print=mutt_save_attachment %s;
+
+application/x-zip-compressed; echo %s; print=mutt_save_attachment %s;
+application/zip; echo %s; print=mutt_save_attachment %s;

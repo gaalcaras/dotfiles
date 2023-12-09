@@ -1,0 +1,20 @@
+# ==== Posteo configuration ====
+
+# ---- Change these variables ----
+set my_account = "posteo"
+set my_email = $my_posteo_em
+set my_smtp_login = $my_posteo_em
+
+set my_drafts = "drafts"
+set my_sent = "sent"
+set my_trash = "trash"
+
+# IMAP folders to scan quickly
+set my_quick_scan = "INBOX,Comptes,Orders"
+
+# ---- Config mailbox ----
+source ~/.config/neomutt/mailbox
+
+color status $my_line_bright $my_green_bright
+
+# vim: set ft=neomuttrc:

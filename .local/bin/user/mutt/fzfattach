@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+attachment="$(fd . "$HOME" --type f -L | fzf)"
+
+echo "push '<space>a$attachment<enter>'"

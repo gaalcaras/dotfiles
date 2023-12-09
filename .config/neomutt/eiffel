@@ -1,0 +1,19 @@
+# EIFFEL configuration
+
+# ---- Change these variables ----
+set my_account = "eiffel"
+set my_email = $my_eiffel_em
+set my_smtp_login = $my_eiffel_em
+
+set my_drafts = "drafts"
+set my_sent = "sent"
+set my_trash = "trash"
+
+# IMAP folders to scan quickly
+set my_quick_scan = "INBOX"
+
+source ~/.config/neomutt/mailbox
+
+color status $my_line_bright $my_blue_bright
+
+# vim: set ft=neomuttrc:

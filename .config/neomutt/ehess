@@ -1,0 +1,17 @@
+# EHESS configuration
+
+# ---- Change these variables ----
+set my_account = "ehess"
+set my_email = $my_eiffel_em
+set my_smtp_login = $my_gmail_em
+
+set my_drafts = "drafts"
+set my_sent = "sent"
+set my_trash = "trash"
+
+# IMAP folders to scan quickly
+set my_quick_scan = "INBOX"
+
+source ~/.config/neomutt/mailbox
+
+# vim: set ft=neomuttrc:

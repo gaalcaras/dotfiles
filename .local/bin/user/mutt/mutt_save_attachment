@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+TMPFILE="$1"
+NEWFILE=$(basename "$1")
+DOWNLOAD_DIR="$HOME/inbox/downloads/mutt"
+
+# Copy the file to our new spot so mutt will not delete it
+# before the script has a chance to print it.
+
+NEWDIR="$DOWNLOAD_DIR/$(date +%y-%m)"
+mkdir -p "$NEWDIR"
+
+cp "$TMPFILE" "$NEWDIR/$NEWFILE"
