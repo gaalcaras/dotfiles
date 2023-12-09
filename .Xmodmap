@@ -1,0 +1,4 @@
+! Remap Capslock to Escape
+! clear lock
+! keycode 119 = Escape
+! add Lock = Caps_Lock
