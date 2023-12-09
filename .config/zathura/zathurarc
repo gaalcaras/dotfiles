@@ -1,0 +1,16 @@
+# Connect to clipboard
+set selection-clipboard clipboard
+
+set incremental-search true
+
+# Open document in fit-width mode by default
+set adjust-open "best-fit"
+
+set synctex true
+set synctex-editor-command 'nvr --servername /tmp/mynvimserver --remote-silent +%l "%f"'
+
+# BÉPO vim keymapping
+map c scroll left
+map t scroll down
+map s scroll up
+map r scroll right
