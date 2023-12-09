@@ -1,0 +1,8 @@
+#! /bin/bash
+
+# theme="$(cat "$HOME"/.theme_dark)"
+
+# # feh --bg-fill "/home/gaalcaras/.dotfiles/wallpaper/fleurs-$theme.jpg"
+# feh --bg-fill "/home/gaalcaras/.dotfiles/wallpaper/keefe.jpg"
+
+hsetroot -solid '#373B41'

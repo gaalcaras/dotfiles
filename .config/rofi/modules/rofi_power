@@ -1,0 +1,81 @@
+#!/bin/bash
+# ########################################################################
+# ROFI SCRIPT: POWER
+# by Gabriel Alcaras
+#
+# Helper script to power down, reboot, suspend, hibernate, lock and so on.
+#
+# Script to be used as an extra mode for rofi (using -modi argument or the
+# config file).
+# ########################################################################
+
+
+# -----
+# SETUP
+# -----
+LOCK="lock"
+SUSPEND="suspend"
+EXIT="exit"
+HIBERNATE="exit"
+SHUTDOWN="shutdown"
+REBOOT="reboot"
+GPU="gpu"
+LAPTOP="laptop"
+HOMEDESK="homedesk"
+
+OPTIONS=$(printf "$LOCK\\n$SUSPEND\\n$EXIT\\n$HIBERNATE\\n$SHUTDOWN\\n$REBOOT\\n$GPU\\n$LAPTOP\\n$HOMEDESK")
+WM=${1:-"sway"}
+THEME=${2:-"dark"}
+
+option=$(echo -e "$OPTIONS" | rofi -dmenu -i -p "power>" -theme "$THEME" | awk '{print $1}' | tr -d '\r\n' | tr -cd '[:alnum:]')
+if [ ${#option} -gt 0 ]
+then
+    case $option in
+      reboot)
+        systemctl reboot
+        ;;
+      shutdown)
+        systemctl poweroff
+        ;;
+      exit)
+        if [[ $WM == "sway" ]]; then
+          swaymsg exit
+        else
+          i3-msg exit
+        fi
+        ;;
+      lock)
+        if [[ $WM == "sway" ]]; then
+          swaylock -lef
+        else
+          i3lock_theme
+        fi
+        ;;
+      suspend)
+          systemctl suspend
+        ;;
+      hibernate)
+        if [[ $WM == "sway" ]]; then
+          swaylock -lef
+        else
+          i3lock_theme
+        fi
+        systemctl hibernate
+        ;;
+      gpu)
+        if [[ $(optimus-manager --print-mode) =~ "nvidia" ]]; then
+          optimus-manager --switch intel --no-confirm
+        else
+          optimus-manager --switch nvidia --no-confirm
+        fi
+        ;;
+      laptop)
+        "$HOME"/.dotfiles/bin/hardware/monitor_switch "laptop" >> "$HOME"/monitors.log
+        ;;
+      homedesk)
+        "$HOME"/.dotfiles/bin/hardware/monitor_switch "homedesk"
+        ;;
+      *)
+        ;;
+    esac
+  fi

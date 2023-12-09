@@ -1,0 +1,5 @@
+#!/bin/bash
+
+THEME=${1:-"dark"}
+
+rofi -modi "pdf:~/.dotfiles/rofi/modules/bib/open_pdf,md:~/.dotfiles/rofi/modules/bib/open_md,inbox:~/.dotfiles/rofi/modules/bib/open_inbox,clipboard:~/.dotfiles/rofi/modules/bib/clipboard" -show pdf -i -p " " -theme "$THEME" -sidebar-mode 

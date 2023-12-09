@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [[ "$*" =~ [A-Z].* ]]; then
+  BIBKEY=$(echo "$*" | cut -d'@' -f2)
+  echo "-$BIBKEY-" >> rofilog
+  FILE="$BIB_PDF_DIR/${BIBKEY:0:1}/$BIBKEY.pdf"
+  if [[ -f "$FILE" ]]; then
+    echo "$FILE" >> ~/rofilog
+    nohup "$PDFREADER" "$FILE" &>/dev/null &
+    exit 0
+  fi
+  exit 0
+fi
+bibparse -s -r

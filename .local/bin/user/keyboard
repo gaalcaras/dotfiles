@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Kill xcape (prevent multiple key events when pressing one key)
+killall xcape
+
+# KEYBOARD SETUP
+# Expected behaviour :
+# - CapsLock works as Escape when used on its own and as control when used in
+#   combination with other keys
+# - Tab works normally but is Hyper when used in combination with other keys
+# - w works normally but is Hyper when used in combination with other keys
+
+# Find keyboards ID
+thinkpad=$(xinput list | grep "AT Translated Set 2 keyboard" | grep -o 'id=[0-9]*' | cut -d = -f 2)
+typematrix=$(xinput list | grep "TypeMatrix.com USB" | grep -v "Control" | grep -o 'id=[0-9]*' | cut -d = -f 2)
+
+# Setup keyboard with xkb only :
+# - EVERYTHING :
+#    - Map Tab to HyperL (Tab when pressed once)
+#    - Map w to HyperR (w when pressed once)
+# - THINKPAD :
+#    - Use CapsLock as Control (Escape when pressed once)
+# - TYPEMATRIX :
+#    - Use Delete Key as Escape
+
+# For some reason, xcape does not seem to handle keyboard specific settings, so
+# we need some general mapping first
+xkbcomp -w3 "-I$HOME/.xkb" "$HOME/.xkb/keymap/custom" "$DISPLAY"
+
+# Then use xcape to define behaviour when short press (<300ms)
+xcape -t 300 -e "Control_L=Escape;Hyper_L=Tab;Hyper_R=w"
+
+# For main laptop keyboard (id=3, run xinput to find it)
+xkbcomp -w3 -i "$thinkpad" "-I$HOME/.xkb" "$HOME/.xkb/keymap/thinkpad" "$DISPLAY"
+
+# For external TypeMatrix keyboard (id=18, run xinput to find it)
+xkbcomp -w3 -i "$typematrix" "-I$HOME/.xkb" "$HOME/.xkb/keymap/typematrix" "$DISPLAY"

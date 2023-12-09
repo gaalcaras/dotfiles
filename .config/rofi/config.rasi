@@ -1,0 +1,11 @@
+configuration {
+  modi: "run";
+  run-shell-command: "alacritty -e sh -c 'sleep 0.1 && {cmd}'";
+  hide-scrollbar: true;
+  display-run: "> ";
+  display-window: " ";
+}
+
+@theme "dark"
+
+/* vim:ft=css

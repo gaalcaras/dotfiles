@@ -1,0 +1,89 @@
+icons_format = "{icon}"
+
+[icons]
+icons = "awesome6"
+
+[[block]]
+block = "time"
+interval = 5
+format = " $timestamp.datetime(f:'%a %d/%m %R') "
+[block.theme_overrides]
+idle_fg = "#cc6666"
+
+[[block]]
+block = "sound"
+headphones_indicator = true
+[block.theme_overrides]
+idle_fg = "#de935f"
+
+[[block]]
+block = "bluetooth"
+mac = "70:BF:92:38:52:0D"
+disconnected_format = ""
+format = " $icon Jabra "
+[block.theme_overrides]
+good_fg = "#f0c674"
+
+[[block]]
+block = "bluetooth"
+mac = "EC:81:93:9C:4F:3B"
+disconnected_format = ""
+format = " $icon HiFi "
+[block.theme_overrides]
+good_fg = "#f0c674"
+
+[[block]]
+block = "bluetooth"
+mac = "38:18:4C:68:95:F1"
+disconnected_format = ""
+format = " $icon Sony "
+[block.theme_overrides]
+good_fg = "#f0c674"
+
+[[block.click]]
+button = "left"
+cmd = "pavucontrol"
+
+[[block]]
+block = "temperature"
+format = " $icon $max max "
+format_alt = " $icon $min min, $max max, $average avg "
+interval = 10
+chip = "*-isa-*"
+[block.theme_overrides]
+good_fg = "#b5bd68"
+warning_fg = "#b5bd68"
+critical_fg = "#b5bd68"
+
+[[block]]
+block = "custom"
+watch_files = ["~/.local/share/email/status"]
+command = "STATUS=\"$(cat ~/.local/share/email/status)\"; [[ \"$STATUS\" == \"OFFLINE\" ]] && echo \"OFF\""
+hide_when_empty = true
+format = "  $text.pango-str() "
+[block.theme_overrides]
+idle_fg = "#8abeb7"
+
+[[block]]
+block = "custom"
+watch_files = ["~/.msmtpqueue/.lastemail"]
+command = "SENDQUEUE=\"$(find ~/.msmtpqueue -name '*.mail' -printf '.' | wc -c)\"; [[ $SENDQUEUE -eq 0 ]] || echo \"$SENDQUEUE\";"
+hide_when_empty = true
+format = "  $text.pango-str() "
+[block.theme_overrides]
+idle_fg = "#8abeb7"
+
+[[block]]
+block = "battery"
+format = " $icon $percentage {$time |}"
+[block.theme_overrides]
+idle_fg = "#81a2be"
+good_fg = "#81a2be"
+warning_fg = "#81a2be"
+critical_fg = "#81a2be"
+
+[[block]]
+block = "net"
+format = " $icon {$signal_strength $ssid |Wired connection}"
+[block.theme_overrides]
+idle_fg = "#b294bb"

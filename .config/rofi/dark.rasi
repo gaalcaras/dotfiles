@@ -1,0 +1,72 @@
+* {
+  background-color: transparent;
+  accent: ${ROFIACCENT};
+
+  border-color: @accent;
+  color: @accent;
+  font: "Fira Code 12";
+
+}
+
+window {
+  background-color: #1d1f21aa;
+  padding: 30%;
+  fullscreen: true;
+}
+
+mainbox {
+  border-radius: 10px;
+  border: 2px;
+  padding: 10px;
+}
+
+inputbar {
+  border: 0 0 2px 0;
+  margin: 0 0 10px 0;
+  padding: 0 0 10px 0;
+}
+
+entry {
+  font: "Fira Code Italic 12";
+}
+
+prompt {
+  font: "Fira Code Bold 12";
+}
+
+element.selected {
+  color: white;
+}
+
+listview {
+  columns: ${ROFICOL};
+}
+
+element-text {
+  padding: 2px;
+}
+
+element-text selected {
+  background-color: @accent;
+  color: white;
+}
+
+message {
+  padding: 0 0 10px 0;
+}
+
+textbox {
+  font: "Fira Code Italic 12";
+}
+
+mode-switcher {
+  border: 2px 0 0 0;
+}
+
+button selected {
+  padding: 10px;
+  background-color: @accent;
+  color: white;
+  font: "Fira Code Bold 12";
+}
+/* vim:ft=css

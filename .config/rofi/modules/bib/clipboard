@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [[ "$*" =~ [A-Z].* ]]; then
+  BIBKEY=$(echo "$*" | cut -d'@' -f2)
+  echo "-$BIBKEY-" >> rofilog
+  echo "$BIBKEY" >> /tmp/bib_clipboard
+  echo -en "\0message\x1fso far: $(paste -sd "," /tmp/bib_clipboard)\n"
+  echo -en "continue\nquit"
+elif [[ "$*" == "quit" ]]; then
+  mkdir -p /tmp/bib
+  nohup ~/.dotfiles/rofi/modules/bib/prep_bib_clipboard &>/dev/null &
+  exit 0
+else
+  bibparse -s -r
+fi

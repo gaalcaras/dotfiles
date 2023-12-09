@@ -1,0 +1,7 @@
+#!/bin/bash
+
+bibparse -g "$(paste -sd "," /tmp/bib_clipboard)" -b > /tmp/bib/selected.bib
+pandoc /tmp/bib/selected.bib -s --citeproc -o /tmp/bib/selected.html
+sh -c "html2text /tmp/bib/selected.html | xclip -selection clipboard"
+notify-send -a "bib" "$(paste -sd "," /tmp/bib_clipboard) in clipboard"
+rm /tmp/bib_clipboard
