@@ -1,0 +1,11 @@
+---
+colorize: true
+style: monokai
+formatter: terminal256
+pager: less -FRX
+
+cheatpaths:
+  - name: personal
+    path: ~/.dotfiles/cheat.config/sheets
+    tags: [ personal ]
+    readonly: false

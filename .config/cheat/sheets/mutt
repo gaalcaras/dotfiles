@@ -1,0 +1,30 @@
+# Reading messages
+
+i         -> 'Show the whole thread of this email'
+g{i,b,u}  -> 'Go to inbox, blackhole or unprocessed'
+g{t,l}    -> 'Go to "Answer today" or "Answer later"'
+g{a,s,f}  -> 'Go to archive, sent or flagged/starred'
+
+# Tagging and moving threads
+
+I         -> 'Tag to inbox'
+B         -> 'Tag to blackhole'
+T         -> 'Tag to "Answer today"'
+L         -> 'Tag to "Answer later"'
+
+!{!,-}    -> 'Flag/star and unflag/unstarred message'
+
+cgg       -> 'Prompt user to choose a folder in gmail account'
+cg{i,a,s} -> 'Move message directly to inbox, archive or sent'
+
+# Selecting and filtering emails
+
+Space     -> 'Tag thread'
+D         -> 'Delete all emails (or just matching pattern)'
+Ctrl+A    -> 'Select all emails (or just matching pattern)'
+
+,{f,t}    -> 'Only show emails from same sender or from the current thread'
+,a        -> 'Clear limits / filters'
+Ctrl+L    -> 'Clear selected / tagged emails'
+
+U         -> 'Unsubscribe from mailing list'
