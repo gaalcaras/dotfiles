@@ -1,0 +1,9 @@
+#! /bin/bash
+
+BIBKEY=$(bibparse | rofi -dmenu -theme yellow | cut -d":" -f1)
+
+FILE="$BIB_PDF_DIR/${BIBKEY:0:1}/$BIBKEY.pdf"
+
+if [[ -f "$FILE" ]]; then
+  "$PDFREADER" "$FILE"
+fi

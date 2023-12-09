@@ -1,0 +1,20 @@
+#! /bin/bash
+
+KEY="$*"
+INBOX="$BIB_DIR/inbox"
+INBOX_BAK="$BIB_DIR/.inbox"
+
+# If key is not already in the inbox...
+if ! grep -q "$KEY" "$INBOX"; then
+  # If reference is in the inbox backlog...
+  if grep -q "$KEY" "$INBOX_BAK"; then
+    # Then move that line to the inbox and delete it from the backlog
+    grep "$KEY" "$INBOX_BAK" | uniq >> "$INBOX"
+    grep -v "$KEY" "$INBOX_BAK" | uniq >> "/tmp/inbox_bak"
+    mv "/tmp/inbox_bak" "$INBOX_BAK"
+  else
+    # Otherwise, add reference as a new entry in the inbox
+    echo "$(date +"%Y-%m-%d"), $KEY" >> "$INBOX"
+  fi
+fi
+

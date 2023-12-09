@@ -1,0 +1,9 @@
+#! /bin/bash
+
+KEY="$*"
+
+SUBDIR=${KEY:0:1}
+mkdir -p "$BIB_NOTE_DIR/$SUBDIR"
+PDF="$BIB_NOTE_DIR/$SUBDIR/$KEY.md"
+
+nv "$PDF"

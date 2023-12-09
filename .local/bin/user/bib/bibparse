@@ -1,0 +1,162 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+# Process bib file
+"""
+
+import argparse
+import os
+import re
+
+# BIB PATTERNS
+
+ENTRY_START = re.compile(r'^@(\w+){\s*(\S+),')
+FIELD_START = re.compile(r'^\W*(\w+)\s*=\s*{([^}]*)(}?)')
+FIELD_END = re.compile(r'^\s*([^}]+)\s*},?$')
+ENTRY_END = re.compile(r'^}')
+
+FIELDS = {
+    'title': ['title', 'chapter'],
+    'author': ['author', 'editor']
+}
+
+# REGEX
+AUTHOR = re.compile(r'([^,]+), ([A-Z])\w+')
+AUTHORS = re.compile(r'^(.* \+ .*) \+ .*')
+
+# OPTIONS
+
+PARSER = argparse.ArgumentParser()
+PARSER.add_argument("-s", "--short", help="shorten output", action="store_true")
+PARSER.add_argument("-r", "--rofi", help="rofi output", action="store_true")
+PARSER.add_argument("-g", "--get", help="get reference with bibkey")
+PARSER.add_argument("-b", "--bib", help="output bib format", action="store_true")
+
+ARGS = PARSER.parse_args()
+
+# GLOBAL
+
+RAW = ""
+
+class Entry:
+
+    """BibLatex entry"""
+
+    def __init__(self, entry_type, bibkey, line):
+        self.reset()
+        self._append_field = ''
+        self.data['type'] = entry_type
+        self.data['bibkey'] = bibkey
+        self.data['lines'] = line
+
+    def reset(self):
+        self.data = {'type': '', 'bibkey': '', 'fields': {}}
+
+    def add_line(self, value):
+        self.data['lines'] += value
+
+    def add_field(self, field, value, complete=True):
+        self.data['fields'][field] = value
+
+        if not complete:
+            self._append_field = field
+
+    def append_field(self, value):
+        self.data['fields'][self._append_field] += value
+
+    def get(self, value, short=False):
+        if value not in FIELDS:
+            return self.data['fields'][value]
+
+        for field in FIELDS[value]:
+            if field in self.data['fields']:
+                result = self.data['fields'][field]
+
+        if short:
+            if value == 'author':
+                result = shorten_author(result)
+
+        return result
+
+    def validate(self):
+        for field, value in self.data['fields'].items():
+            self.data['fields'][field] = re.sub('\n', ' ', value.strip())
+
+def parse_bib(bib_file, callback=None, key=None):
+    parsing = False
+    result = {}
+    for _, line in enumerate(bib_file):
+        if re.match(ENTRY_START, line):
+            match = re.match(ENTRY_START, line)
+            entry_type, bibkey = match.group(1), match.group(2)
+
+            if key is not None and bibkey not in key:
+                continue
+
+            parsing = True
+            entry = Entry(entry_type, bibkey, line)
+            continue
+
+        if parsing:
+            entry.add_line(line)
+
+            if re.match(FIELD_START, line):
+                match = re.match(FIELD_START, line)
+                complete = bool(match.group(3) != '')
+                entry.add_field(match.group(1).lower(), match.group(2), complete)
+                continue
+
+            if re.match(FIELD_END, line):
+                match = re.match(FIELD_END, line)
+                entry.append_field(match.group(1))
+                continue
+
+            if re.match(ENTRY_END, line):
+                parsing = False
+                entry.validate()
+
+                if callback is not None:
+                    formatted_entry = callback(entry)
+                    result[entry.data['bibkey']] = formatted_entry
+                    if not key:
+                        print(formatted_entry)
+
+                continue
+
+    if key is not None:
+        for k in key:
+            if k in result:
+                print(result[k])
+
+def print_raw(entry):
+    return entry.data['lines']
+
+def print_ref(entry):
+    return f"{entry.data['bibkey']}:: {entry.get('author', ARGS.short)} ({entry.data['fields']['year']}), {entry.get('title')}"
+
+def print_rofi_ref(entry):
+    return f"{entry.get('author', ARGS.short)} ({entry.data['fields']['year']}), {entry.get('title')} @{entry.data['bibkey']}\0meta\x1f{entry.get('author')}"
+
+def shorten_author(entry):
+    entry = re.sub(r'[A-Z]\.', '', entry)
+    entry = re.sub(r' and ', ' + ', entry)
+
+    if re.match(AUTHORS, entry):
+        entry = re.sub(AUTHORS, r'\1 + al.', entry)
+
+    if re.match(AUTHOR, entry):
+        return re.sub(AUTHOR, r'\1, \2', entry).strip()
+
+with open(os.path.expandvars('$BIB_FILE')) as bib_f:
+    if ARGS.bib:
+        CALLBACK = print_raw
+    else:
+        CALLBACK = print_ref
+        if ARGS.rofi:
+            CALLBACK = print_rofi_ref
+
+    KEY = None
+    if ARGS.get is not None:
+        KEY = ARGS.get.split(',')
+
+    parse_bib(bib_f, CALLBACK, KEY)

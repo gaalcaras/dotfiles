@@ -1,0 +1,106 @@
+#! /bin/bash
+
+# Given a key, open matching file (most of the time a pdf, could be an epub as
+# well)
+
+ask() {
+    # https://gist.github.com/davejamesmiller/1965569
+    local prompt default reply
+
+    if [ "${2:-}" = "Y" ]; then
+        prompt="Y/n"
+        default=Y
+    elif [ "${2:-}" = "N" ]; then
+        prompt="y/N"
+        default=N
+    else
+        prompt="y/n"
+        default=
+    fi
+
+    while true; do
+
+        # Ask the question (not using "read -p" as it uses stderr not stdout)
+        echo -n "$1 [$prompt] "
+
+        # Read the answer (use /dev/tty in case stdin is redirected from somewhere else)
+        read reply </dev/tty
+
+        # Default?
+        if [ -z "$reply" ]; then
+            reply=$default
+        fi
+
+        # Check if the reply is valid
+        case "$reply" in
+            Y*|y*) return 0 ;;
+            N*|n*) return 1 ;;
+        esac
+
+    done
+}
+
+KEY="$*"
+
+while true; do
+  FILE=$(find ~/inbox/downloads/ -type f -regex ".*\.\(pdf\|epub\)" -printf "%T+\t%p\n" | sort -r | cut -f2 | fzf --prompt "FILE for $KEY> " --preview="pdftotext -l 10 -nopgbrk -q -- {} -")
+
+  if [[ -z "$FILE" ]]; then
+    exit 1
+  fi
+
+  "$PDFREADER" "$FILE" 2>/dev/null & disown
+
+  if ask "Is that the right file for $KEY?"; then
+    break;
+  else
+    continue;
+  fi
+done
+
+if [[ "$FILE" =~ "pdf" ]]; then
+  NEWNAME="$KEY.pdf"
+  if command -v ps2pdf >/dev/null; then
+    echo "Compressing PDF..."  >&2
+    ps2pdf "$FILE" "/tmp/min_$KEY.pdf"
+
+    new_size=$(stat -c %s "/tmp/min_$KEY.pdf")
+    old_size=$(stat -c %s "$FILE")
+
+    if (( "$new_size" < "$old_size" )); then
+      echo "File size has been reduced by $((new_size*100/old_size))%!" >&2
+      rm "$FILE"
+      FILE="/tmp/min_$KEY.pdf"
+    else
+      echo "File size could not be reduced." >&2
+    fi
+  fi
+elif [[ "$FILE" =~ "epub" ]]; then
+  NEWNAME="$KEY.epub"
+fi
+
+SUBDIR=${KEY:0:1}
+
+if [[ "$SUBDIR" == "_" ]]; then
+  NEWPATH="/tmp/$NEWNAME"
+else
+  NEWPATH="$BIB_PDF_DIR/$SUBDIR/$NEWNAME"
+  mkdir -p "$BIB_PDF_DIR/$SUBDIR"
+fi
+
+if [[ -f "$NEWPATH" ]]; then
+  echo "$NEWPATH already exists!"
+  exit 0
+fi
+
+mv "$FILE" "$NEWPATH"
+
+if [[ -f "$NEWPATH" ]]; then
+  echo "$FILE has been successfully moved to $NEWPATH"
+  exit 0
+else
+  echo "$FILE could not be moved :("
+  exit 1
+fi
+
+./"$BIB_DIR"/update_latest_pdfs

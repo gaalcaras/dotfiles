@@ -1,0 +1,35 @@
+#! /bin/bash
+
+KEY="$*"
+
+SUBDIR=${KEY:0:1}
+
+VALID_EXT="pdf epub"
+
+# File could be either in /tmp or already in my PDF dir
+function locate_file() {
+  local ext="$1"
+  if [[ "$SUBDIR" == "_" ]]; then
+    echo "/tmp/$KEY.$ext"
+  else
+    echo "$BIB_PDF_DIR/$SUBDIR/$KEY.$ext"
+  fi
+}
+
+# Loop through accepted extensions for files
+function find_file() {
+  local file=""
+  for EXT in $VALID_EXT; do
+    file=$(locate_file "$EXT")
+    [[ -f "$file" ]] && break
+  done
+  echo "$file"
+}
+
+FILE=$(find_file)
+
+if [[ -f "$FILE" ]]; then
+  "$PDFREADER" "$FILE" 2>/dev/null & disown
+else
+  exit 2
+fi

@@ -1,0 +1,16 @@
+#! /bin/bash
+
+KEY="$*"
+INBOX="$BIB_DIR/inbox"
+INBOX_BAK="$BIB_DIR/.inbox"
+
+# If reference is in inbox...
+if grep -q "$KEY" "$INBOX"; then
+  # Move the matching line to the inbox backlog
+  grep "$KEY" "$INBOX" >> "$INBOX_BAK"
+
+  # Keep all other lines in the inbox
+  grep -v "$KEY" "$INBOX" >> "/tmp/inbox"
+  mv /tmp/inbox "$INBOX"
+fi
+

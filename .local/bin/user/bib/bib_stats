@@ -1,0 +1,13 @@
+#! /bin/bash
+
+TOTAL=$(grep -c "^@" "$BIB_FILE")
+READ=$(grep -c "Keywords.*read" "$BIB_FILE")
+INBOX=$(grep -c "Keywords.*inbox" "$BIB_FILE")
+NOFILE=$(grep -c "Keywords.*nofile" "$BIB_FILE")
+
+echo "References: $TOTAL (100%)"
+echo "----------------------"
+echo "Inbox:      $INBOX  ($(("$INBOX*100/$TOTAL"))%)"
+echo "Read:       $READ  ($(("$READ*100/$TOTAL"))%)"
+echo "----------------------"
+echo "No file:    $NOFILE  ($(("$NOFILE*100/$TOTAL"))%)"
