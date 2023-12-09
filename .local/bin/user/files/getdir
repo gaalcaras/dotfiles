@@ -1,0 +1,9 @@
+#!/bin/env bash
+
+SEARCH_PATH="$*"
+
+if [[ -z "$SEARCH_PATH" ]]; then
+  SEARCH_PATH="$HOME"
+fi
+
+fd -L --type d --base-directory "$SEARCH_PATH" | fzf -e

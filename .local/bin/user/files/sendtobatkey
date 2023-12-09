@@ -1,0 +1,7 @@
+#!/bin/env bash
+
+TODAY="$(date '+%Y-%m-%d %a')"
+KEYPATH="/run/media/gaalcaras/batkey/$TODAY"
+
+mkdir -p "$KEYPATH"
+cp "$1" "$KEYPATH"

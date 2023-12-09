@@ -1,0 +1,158 @@
+set shell zsh
+
+set sortby natural
+set noreverse
+set info size
+
+# column ratios
+set ratios 1:2:1
+
+set icons true
+
+set previewer ~/.config/lf/previewer.sh
+
+# Bépo keybindings
+map t down
+map s up
+map c updir
+map r open
+map <enter> open
+
+cmd open $set -f; rifle -p 0 $fx
+
+# Rename
+map R rename # at the very end
+map C push R<c-u> # new rename
+map I push R<c-a> # at the very beginning
+map i push R<a-b><a-b><a-f> # before extension
+map a push R<a-b> # after extension
+cmd bulkrename $vidir
+map B bulkrename
+
+map d
+map dd cut
+map dD delete
+
+map <c-l> clear
+
+cmd mkdir %mkdir "$@"
+
+cmd gotodir ${{
+  lf -remote "send $id cd '~/$(getdir)'"
+}}
+
+cmd gotodirfile ${{
+  lf -remote "send $id cd \"~/$(dirname "$(fzf)")\""
+}}
+
+cmd gotodir_local ${{
+  dest=$(getdir "$(dirname "$fx")")
+  lf -remote "send $id cd '$dest'"
+}}
+
+cmd cptodir ${{
+  dest=$(getdir)
+  basename=$(basename "$fx")
+  lf -remote "send $id \$rsync -a --stats --progress \"$fx\" \"$dest/$basename\""
+}}
+
+
+map Sn :set sortby natural; set noreverse
+map Ss :set sortby size; set reverse
+map St :set sortby time; set reverse
+map Sa :set sortby atime; set info atime; set reverse
+map Sc :set sortby ctime; set info ctime; set reverse
+map Se :set sortby ext; set info size; set noreverse
+
+map gt gotodir
+map gT gotodir_local
+map C cptodir
+map gf gotodirfile
+
+map m
+map md push :mkdir<space>
+
+map g. cd ~/.dotfiles
+map gm cd /run/media/gaalcaras/
+
+map gdd cd ~/inbox/downloads
+map gdf :{{
+  cd ~/inbox/downloads/Firefox
+  push St
+}}
+map gdm :{{
+  cd ~/inbox/downloads/mutt
+  push St
+}}
+map gdt :{{
+  cd ~/inbox/downloads/Telegram Desktop
+  push St
+}}
+
+map gpt cd ~/chercher/these/phd-thesis
+
+cmd copypath ${{
+  echo -n "$fx" | xclip -selection clipboard
+}}
+
+map Y copypath
+
+cmd opentermindir ${{
+  if [ -d "$fx" ]; then
+    dest="$fx"
+  else
+    dest="$(dirname "$fx")"
+  fi
+  i3-msg "exec alacritty --working-directory '$dest'"
+}}
+
+map T opentermindir
+
+cmd runjpnb ${{
+  if [ -d "$fx" ]; then
+    dest="$fx"
+  else
+    dest="$(dirname "$fx")"
+  fi
+  jupyter notebook --notebook-dir="$dest"
+}}
+
+map J runjpnb
+
+# Rename the file with a completely different name
+map mc push :rename<space>
+
+# Edit the current filename
+map ma ${{
+  # get 'basename' of the selection
+  filename="${f##*/}"
+  # quote it so we won't deal with quotes in the lf -remote command
+  filename="$(printf '%q' "$filename")"
+  filename="${filename// /<space>}"
+  lf -remote "send $id push :rename<space>$filename"
+}}
+
+# Edit filename before the extension
+map me ${{
+  # get 'basename' of the selection
+  filename="${f##*/}"
+  # quote it so we won't deal with quotes in the lf -remote command
+  filename="$(printf '%q' "$filename")"
+  filename="${filename// /<space>}"
+  lf -remote "send $id push :rename<space>$filename<a-b><c-b>"
+}}
+
+map .m ${{ ~/.dotfiles/bin/files/sendtobatkey "$fx" }}
+
+# Unmount disk
+map U ${{ umount "$fx" }}
+
+# PDF
+map ,
+map ,p ${{ libreoffice --headless --convert-to pdf "$fx" }}
+map ,P ${{ print_file "$fx" }}
+map ,u ${{ pdfunite *.pdf  }}
+map ,s ${{ pdf_split_even_odd_pages *.pdf  }}
+
+map <backspace2> set hidden!
+map <backspace> set hidden!
