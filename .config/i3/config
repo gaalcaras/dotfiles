@@ -237,12 +237,12 @@ bindsym $alt+m focus floating; mode "movefloating"
 # Multimedia Keys: volume
 set $volume_offset "5"
 
-bindsym XF86AudioRaiseVolume exec $localbin/audio/volume_offset +$volume_offset%
-bindsym $mod+Up exec $localbin/audio/volume_offset +$volume_offset%
-bindsym XF86AudioLowerVolume exec $localbin/audio/volume_offset -$volume_offset%
-bindsym $mod+Down exec $localbin/audio/volume_offset -$volume_offset%
+bindsym XF86AudioRaiseVolume exec NO_NOTIFY_COLOR=TRUE i3-volume up $volume_offset -np
+bindsym $mod+Up exec NO_NOTIFY_COLOR=TRUE i3-volume up $volume_offset -np
+bindsym XF86AudioLowerVolume exec NO_NOTIFY_COLOR=TRUE i3-volume down $volume_offset -np
+bindsym $mod+Down exec NO_NOTIFY_COLOR=TRUE i3-volume down $volume_offset -np
 
-bindsym XF86AudioMute exec pactl set-sink-mute $(getsink) toggle # mute sound
+bindsym XF86AudioMute exec NO_NOTIFY_COLOR=TRUE i3-volume mute -np
 
 # Multimedia Keys: brightness control (with light)
 set $brightness_offset "5"
