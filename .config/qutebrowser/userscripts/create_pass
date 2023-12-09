@@ -1,0 +1,10 @@
+#! /bin/bash
+
+URL=$(echo "$QUTE_URL" | awk -F[/:] '{print $4}')
+URL=${URL/www\./}
+DOMAIN=${URL%%.*}
+EMAIL="batmail+$DOMAIN@posteo.net"
+
+pass generate -cn "www/$URL/$EMAIL"
+
+notify-send -a "Generated pass for $URL" "Password for user $EMAIL has been copied in clipboard."

@@ -1,0 +1,2 @@
+#! /bin/bash
+"$TERM" -e buku -a "$QUTE_URL" -w nvim
