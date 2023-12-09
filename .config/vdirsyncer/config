@@ -1,0 +1,18 @@
+[general]
+status_path = "~/.vdirsyncer/status/"
+
+[pair batpi_contacts]
+a = "batpi_contacts_local"
+b = "batpi_contacts_remote"
+collections = ["from a", "from b"]
+
+[storage batpi_contacts_local]
+type = "filesystem"
+path = "~/.contacts/"
+fileext = ".vcf"
+
+[storage batpi_contacts_remote]
+type = "carddav"
+url.fetch = ["command", "pass", "show", "servers/nuc/nextcloud-dav/url"]
+username.fetch = ["command", "pass", "show", "servers/nuc/nextcloud-dav/user"]
+password.fetch = ["command", "pass", "show", "servers/nuc/nextcloud-dav/pass"]

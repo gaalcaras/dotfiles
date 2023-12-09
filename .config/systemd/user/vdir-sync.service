@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync contacts and calendars (with vdirsyncer)
+After=keyring.target network.target
+ConditionPathExistsGlob=/home/gaalcaras/.local/bin/user/vdir-sync
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/user/vdir-sync --daily
+
+[Install]
+Also=vdir-sync.timer

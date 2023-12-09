@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# ===============================================================
+# Vdirsyncer sync
+#
+# Sync contacts and calendars using vdirsyncer, only when
+# connection seems reliable and servers are up and running.
+#
+# -d/--daily : sync vdir only twice a day
+# ===============================================================
+
+VDIR_LOG="$HOME/.vdir-syncing.log"
+VDIR_LAST="$HOME/.vdir-last-sync.log"
+
+is_quiet=false
+is_daily=false
+
+sync_vdir="vdirsyncer sync"
+uping="$HOME/.dotfiles/bin/uping"
+
+# Arguments {{{
+while [[ $# -gt 0 ]]
+do
+
+  key="$1"
+
+  case $key in
+    -d|--daily)
+    is_daily=true
+    ;;
+    *)
+    # Unknown option
+    ;;
+  esac
+
+  shift
+
+done
+# }}}
+
+# Functions {{{
+
+function log {
+  if $is_quiet; then
+    echo `date +"%Y-%m-%d %H:%M:%S"` "INFO: $1" >> $VDIR_LOG 2>&1
+  else
+    echo `date +"%Y-%m-%d %H:%M:%S"` "INFO: $1" > >(tee -a $VDIR_LOG) 2> >(tee -a $VDIR_LOG >&2)
+  fi
+}
+
+function check {
+  if $is_quiet; then
+    $uping $1 >> $VDIR_LOG 2>&1
+  else
+    $uping $1 > >(tee -a $VDIR_LOG) 2> >(tee -a $VDIR_LOG >&2)
+  fi
+}
+
+# }}}
+
+# Daily check {{{
+if $is_daily; then
+  log 'Running in daily mode'
+  last_sync=`cat $VDIR_LAST`
+  now=`date +%s`
+  delta=$((($now-$last_sync)/3600))
+
+  log "Last sync was about $delta hours ago."
+
+  if [[ $delta -lt 11 ]]; then
+    log "Exit vdir-sync"
+    exit 1;
+  else
+    echo $now > $VDIR_LAST
+  fi
+fi
+# }}}
+
+# Connectivity checks {{{
+check batcloud.me
+
+g_status=$?
+if [ $g_status -ne 0 ]; then
+  log "Exit vdir-sync"
+  exit 1;
+fi
+
+# }}}
+
+# Vdir {{{
+
+exec ${sync_vdir} > >(tee -a $VDIR_LOG) 2> >(tee -a $VDIR_LOG >&2)
+
+# }}}

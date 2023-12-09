@@ -1,0 +1,9 @@
+[Unit]
+Description=Timer to sync contacts and calendars
+
+[Timer]
+OnBootSec=20m
+OnUnitInactiveSec=15m
+
+[Install]
+WantedBy=timers.target
