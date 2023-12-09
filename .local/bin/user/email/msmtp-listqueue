@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# ==========================================
+# Msmtp list queue
+#
+# List emails still in the queue.
+# ==========================================
+
+QUEUEDIR=$HOME/.msmtpqueue
+
+print_log 'Running msmtp-listqueue...'
+
+for i in "$QUEUEDIR"/*.mail; do
+  grep -E -s --colour -h '(^From:|^To:|^Subject:)' "$i" || print_log "No mail in queue";
+  echo " "
+done

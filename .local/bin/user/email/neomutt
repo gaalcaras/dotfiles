@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# If given argument, just use the standard neomutt program
+ARGS="$*"
+
+if [[ -n "$ARGS" ]]; then
+  /bin/neomutt "$@"
+  exit 0
+fi
+
+neomutt_processes=$(pgrep "neomutt" | wc -l)
+echo "$neomutt_processes"
+
+if (( neomutt_processes > 2 )); then
+  # Open second instances of neomutt in read-only mode
+  alacritty -o env.TERM=xterm-direct -e "/bin/neomutt" -R &
+  exit 0
+fi
+
+# If first instance, switch to offline mode
+email-toggle
+
+alacritty -o env.TERM=xterm-direct -e "/bin/neomutt" &
+wait
+
+# When neomutt exits (directly or closing the window in i3), switch back to
+# online mode and send all emails
+email-toggle
+msmtp-runqueue

@@ -1,0 +1,147 @@
+#!/usr/bin/env bash
+
+# ==========================================
+# Msmtp run queue
+#
+# Send emails in the queue (when online,
+# preferably)
+# ==========================================
+
+QUEUEDIR="$HOME/.msmtpqueue"
+LOCKFILE="$QUEUEDIR/.lock"
+TRACKFILE="$QUEUEDIR/progress.csv"
+MAXWAIT=120
+FORCE=false
+
+OPTIONS=$1
+
+while getopts ':f' flag "${@:2}"; do
+  case "${flag}" in
+    f)
+      FORCE=true
+      OPTIONS=$2
+      ;;
+    *) exit 1 ;;
+  esac
+done
+
+TODAY="$(date +%Y-%m-%d-%H.%M.%S)"
+
+function warn {
+  print_log "$1" "WARNING"
+}
+
+function log {
+  print_log "$1" "INFO"
+}
+
+function is_ready_to_send () {
+  filename="$*"
+  send_date=$(echo "$filename" | cut -c1-19)
+
+  if [[ "$send_date" > "$TODAY" ]]; then
+    log "Skipping email to be sent at $send_date"
+    return 1
+  fi
+}
+
+log "Starting msmtp-runqueue..."
+log "$(find "$QUEUEDIR" -name "*.mail" -type f | wc -l) emails in queue"
+
+# Checking if sending emails is ok right now
+if ! "$HOME/.dotfiles/bin/email/email-status"; then
+  if $FORCE; then
+    log "Force option detected, sending anyway"
+  else
+    log "Email is OFFLINE, not sending emails for now."
+    exit 0
+  fi
+fi
+
+# Wait for a lock that another instance has set
+WAIT=0
+while [ -f "$LOCKFILE" ] && [ "$WAIT" -lt "$MAXWAIT" ]; do
+  SIX_HOURS_AGO=$(date -d 'now - 6 hours' +%s)
+  LOCK_DATE=$(date -r "$LOCKFILE" +%s)
+
+  if (( LOCK_DATE <= SIX_HOURS_AGO)); then
+    log "The script has been locked for 6 hours. Deleting lock and moving on!"
+    rm -f "$LOCKFILE"
+  fi
+
+  if [ "$WAIT" -eq 0 ]; then
+    log "The script seems to be already running. Waiting for $MAXWAIT seconds..."
+  fi
+
+  sleep 1
+  WAIT=$((WAIT + 1))
+done
+
+if [ -e "$LOCKFILE" ]; then
+  warn "Cannot use $QUEUEDIR: waited $MAXWAIT seconds for"
+  warn "lockfile $LOCKFILE to vanish, giving up."
+  warn "If you are sure that no other instance of this script is"
+  warn "running, then delete the lock file."
+  exit 1
+fi
+
+# Change into $QUEUEDIR
+cd "$QUEUEDIR" || exit 1
+
+# Check for empty queuedir
+if [ "$(echo ./*.mail)" = './*.mail' ]; then
+  log "No mails in $QUEUEDIR"
+  exit 0
+fi
+
+# Create tracking file
+if [ ! -f "$TRACKFILE" ]; then
+  # If the file doesn't exist, give it some headers
+  echo 'date,words' >> "$TRACKFILE"
+fi
+
+# Lock the $QUEUEDIR
+touch "$LOCKFILE" || exit 1
+
+# Process all mails
+for MAILFILE in *.mail; do
+  MSMTPFILE="${MAILFILE//mail/msmtp}"
+
+  if ! is_ready_to_send "$MSMTPFILE"; then
+    continue
+  fi
+
+  if [ ! -f "$MSMTPFILE" ]; then
+    warn "No corresponding file $MSMTPFILE found"
+    warn "FAILURE"
+    continue
+  fi
+
+  log "Sending $MAILFILE to $(sed -e 's/^.*-- \(.*$\)/\1/' "$MSMTPFILE") ..."
+
+  CONTENT=( $(cat "$MSMTPFILE") )
+  if msmtp "$OPTIONS" "${CONTENT[@]}" < "$MAILFILE"
+  then
+    log "$MAILFILE sent successfully"
+
+    # Log the number of words in the email :
+    # headers, quoted lines, "On xx/xx xx:xx..." lines and attachments are removed
+    RMLINES='/^([a-zA-Z\-]*:[ <]|>| .*|On [0-9]{2}\/[0-9]{2} [0-9]{2}:[0-9]{2}|--|[A-Za-z0-9\/+=]{20})/d'
+    WC=$(sed -E "$RMLINES" "$MAILFILE" | wc -w)
+    echo "$(date +"%Y-%m-%d"),$WC" >> "$TRACKFILE"
+
+    rm "$MAILFILE" "$MSMTPFILE"
+  else
+    warn "FAILURE"
+  fi
+done
+
+# Remove the lock
+rm -f "$LOCKFILE"
+
+# Trigger file
+echo "$TODAY" > "$QUEUEDIR/.lastemail"
+
+log "Stop msmtp-runqueue"
+
+exit 0

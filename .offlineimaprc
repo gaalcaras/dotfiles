@@ -1,0 +1,159 @@
+[general]
+accounts = gmail, ehess, posteo, eiffel
+pythonfile = ~/.config/offlineimap/offlineimap-helpers.py
+
+# Gmail setup {{{
+[Account gmail]
+localrepository = gmail-local
+remoterepository = gmail-remote
+postsynchook = ~/.config/offlineimap/postsync
+quick = 3
+
+[Repository gmail-local]
+type = Maildir
+localfolders = ~/.email/gmail
+
+# Reverse name trans can be tricky.
+# Debug and test new configs with "offlineimap --info"!
+# Also, read:
+# http://www.offlineimap.org/doc/nametrans.html#reverse-nametrans
+nametrans = lambda foldername: re.sub ('bak.sent', '[Gmail]/Messages envoy&AOk-s',
+                               re.sub ('bak.drafts', '[Gmail]/Brouillons',
+                               re.sub ('archives', 'Archives',
+                               re.sub ('inbox', 'INBOX',
+                               re.sub ('bak.spam', '[Gmail]/Spam',
+                               re.sub ('bak.trash', '[Gmail]/Corbeille', foldername))))))
+
+[Repository gmail-remote]
+type = IMAP
+remotehost = imap.gmail.com
+remoteusereval = get_user('gmail.com')
+remotepasseval = get_pass('gmail.com')
+
+# Translate folder names to English, lowercase + underscores
+nametrans = lambda foldername: re.sub ('^\[gmail\]', 'bak',
+                               re.sub ('messages_envoy&aok-s', 'sent',
+                               re.sub ('brouillons', 'drafts',
+                               re.sub ('corbeille', 'trash',
+                               re.sub (' ', '_', foldername.lower())))))
+
+# Do not sync All folders
+folderfilter = lambda foldername: foldername not in ['[Gmail]/Tous les messages']
+
+# Necessary as of OfflineIMAP 6.5.4
+sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+ssl_version = tls1_2
+# }}}
+
+# Ehess setup {{{
+[Account ehess]
+localrepository = ehess-local
+remoterepository = ehess-remote
+postsynchook = ~/.config/offlineimap/postsync
+quick = 1
+
+[Repository ehess-local]
+type = Maildir
+localfolders = ~/.email/ehess
+# Reverse name trans can be tricky.
+# Debug and test new configs with "offlineimap --info"!
+# Also, read:
+# http://www.offlineimap.org/doc/nametrans.html#reverse-nametrans
+nametrans = lambda foldername: re.sub ('Spam', 'Junk',
+                               re.sub ('Inbox', 'INBOX',
+                               re.sub ('Deltachat', 'DeltaChat',
+                               re.sub ('_', ' ', foldername.capitalize()))))
+
+[Repository ehess-remote]
+type = IMAP
+remotehost = rosa.ehess.fr
+remoteusereval = get_user('ehess.fr')
+remotepasseval = get_pass('ehess.fr')
+
+# Translate folder names, lowercase + underscores
+nametrans = lambda foldername: re.sub ('junk', 'spam',
+                               re.sub (' ', '_', foldername.lower()))
+
+# Do not sync All folders
+folderfilter = lambda foldername: foldername not in ['Chats', 'Contacts', 'Emailed Contacts']
+
+# Necessary as of OfflineIMAP 6.5.4
+sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+ssl_version = tls1_2
+# }}}
+
+# Posteo setup {{{
+[Account posteo]
+localrepository = posteo-local
+remoterepository = posteo-remote
+postsynchook = ~/.config/offlineimap/postsync
+quick = 1
+
+[Repository posteo-local]
+type = Maildir
+localfolders = ~/.email/posteo
+# Reverse name trans can be tricky.
+# Debug and test new configs with "offlineimap --info"!
+# Also, read:
+# http://www.offlineimap.org/doc/nametrans.html#reverse-nametrans
+nametrans = lambda foldername: re.sub ('inbox', 'INBOX',
+                               re.sub ('comptes', 'Comptes',
+                               re.sub ('orders', 'Orders',
+                               re.sub ('lists', 'Lists',
+                               re.sub ('gaarbage', 'Gaarbage',
+                               re.sub ('gmail', 'Gmail',
+                               re.sub ('sent', 'Sent',
+                               re.sub ('trash', 'Trash',
+                               re.sub ('archives', 'Archives',
+                               re.sub ('drafts', 'Drafts', foldername))))))))))
+
+[Repository posteo-remote]
+type = IMAP
+remotehost = posteo.de
+remoteusereval = get_user('posteo')
+remotepasseval = get_pass('posteo')
+
+# Translate folder names, lowercase + underscores
+nametrans = lambda foldername: re.sub (' ', '_', foldername.lower())
+
+# Necessary as of OfflineIMAP 6.5.4
+sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+ssl_version = tls1_2
+# }}}
+
+# Eiffel setup {{{
+[Account eiffel]
+localrepository = eiffel-local
+remoterepository = eiffel-remote
+postsynchook = ~/.config/offlineimap/postsync
+quick = 1
+
+[Repository eiffel-local]
+type = Maildir
+localfolders = ~/.email/eiffel
+# Reverse name trans can be tricky.
+# Debug and test new configs with "offlineimap --info"!
+# Also, read:
+# http://www.offlineimap.org/doc/nametrans.html#reverse-nametrans
+nametrans = lambda foldername: re.sub ('Spam', 'Junk',
+                               re.sub ('Inbox', 'INBOX',
+                               re.sub ('_', ' ', foldername.capitalize())))
+
+[Repository eiffel-remote]
+type = IMAP
+remotehost = partage.u-pem.fr
+remoteusereval = get_user('eiffel')
+remotepasseval = get_pass('eiffel')
+
+# Translate folder names, lowercase + underscores
+nametrans = lambda foldername: re.sub ('junk', 'spam',
+                               re.sub (' ', '_', foldername.lower()))
+
+# # Do not sync All folders
+folderfilter = lambda foldername: foldername not in ['Chats', 'Contacts', 'Emailed Contacts']
+
+# Necessary as of OfflineIMAP 6.5.4
+sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+ssl_version = tls1_2
+# }}}
+# vim: fdm=marker fmr={{{,}}} fdl=0 fen

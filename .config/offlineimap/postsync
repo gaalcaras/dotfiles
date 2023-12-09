@@ -1,0 +1,23 @@
+#! /bin/env bash
+
+notmuch new
+
+notmuch tag -unread +sent from:gaalcaras@posteo.net
+notmuch tag -unread +sent from:gaby.alcaras@gmail.com
+notmuch tag -unread +sent from:gabriel.alcaras@ehess.fr
+notmuch tag -unread +sent from:gabriel.alcaras@ens.fr
+notmuch tag -unread +sent from:gabriel.alcaras@telecom-paristech.fr
+notmuch tag -unread +sent from:gabriel.alcaras@univ-eiffel.fr
+
+notmuch tag +inbox path:eiffel/inbox/**
+notmuch tag +inbox path:posteo/inbox/**
+
+notmuch tag -inbox +archive path:posteo/archives/**
+notmuch tag -inbox +archive path:eiffel/archives/**
+
+notmuch tag +sent path:posteo/sent/**
+notmuch tag +sent path:eiffel/sent/**
+
+notmuch tag +trash -inbox -sent -archive folder:/trash/ or folder:/corbeille/
+
+notmuch tag -unread tag:archive tag:trash tag:sent

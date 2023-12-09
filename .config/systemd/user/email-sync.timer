@@ -1,0 +1,9 @@
+[Unit]
+Description=Timer to sync emails
+
+[Timer]
+OnBootSec=15m
+OnUnitInactiveSec=15m
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# ===============================================================
+# Toggle email status
+#
+# ===============================================================
+
+EMAIL_STATUS="$HOME/.local/share/email/status"
+
+if email-status; then
+  NEW_STATUS="OFFLINE"
+else
+  NEW_STATUS="ONLINE"
+fi
+
+echo "$NEW_STATUS" > "$EMAIL_STATUS"
+
+MSG="Switching email status to $NEW_STATUS"
+print_log "$MSG"
+notify-send -a "Email" "$MSG"

@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync emails (retrieve and send queue)
+After=keyring.target network.target
+ConditionPathExistsGlob=/home/gaalcaras/.msmtpqueue
+
+[Service]
+Type=oneshot
+ExecStart=%h/.dotfiles/bin/email/email-sync --quiet
+
+[Install]
+Also=email-sync.timer

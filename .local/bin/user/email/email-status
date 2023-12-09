@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# ===============================================================
+# Check email status
+#
+# ===============================================================
+
+EMAIL_STATUS="$HOME/.local/share/email/status"
+
+if [[ ! -f "$EMAIL_STATUS" ]]; then
+  print_log "Créer $EMAIL_STATUS"
+  mkdir -p "${EMAIL_STATUS%/*}"
+  echo "online" >> "$EMAIL_STATUS"
+fi
+
+print_log "Email is $(< "$EMAIL_STATUS")"
+
+if [[ "$(< "$EMAIL_STATUS")" == "ONLINE" ]]; then
+  exit 0
+else
+  exit 1
+fi

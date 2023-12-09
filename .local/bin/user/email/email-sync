@@ -1,0 +1,145 @@
+#!/bin/bash
+
+# ===============================================================
+# Email sync
+#
+# Send emails in msmtp queue and sync emails with offlineimap,
+# only when connection seems reliable and email servers are up
+# and running.
+#
+# -q/--quiet : run quietly and log to ~/.email-syncing.log
+# -f/--fast  : sync INBOX only, do not send queued emails
+# -d/--daily : sync emails only twice a day
+# ===============================================================
+
+EMAIL_LOG="$HOME/.email-syncing.log"
+EMAIL_LAST="$HOME/.email-last-sync.log"
+EMAIL_STATUS="$HOME/.local/share/email/status"
+
+print_log="$HOME/.dotfiles/bin/utils/print_log"
+
+is_quiet=false
+is_fast=false
+is_daily=false
+
+send_email="$HOME/.dotfiles/bin/email/msmtp-runqueue"
+uping="$HOME/.dotfiles/bin/uping"
+
+# Arguments {{{
+while [[ $# -gt 0 ]]
+do
+
+  key="$1"
+
+  case $key in
+    -q|--quiet)
+    is_quiet=true
+    ;;
+    -f|--fast)
+    is_fast=true
+    ;;
+    -d|--daily)
+    is_daily=true
+    ;;
+    *)
+    # Unknown option
+    ;;
+  esac
+
+  shift
+
+done
+# }}}
+
+# Functions {{{
+
+function log {
+  if $is_quiet; then
+    "$print_log" "$1" >> $EMAIL_LOG 2>&1
+  else
+    "$print_log" "$1" > >(tee -a $EMAIL_LOG) 2> >(tee -a $EMAIL_LOG >&2)
+  fi
+}
+
+function check {
+  if $is_quiet; then
+    $uping $1 >> $EMAIL_LOG 2>&1
+  else
+    $uping $1 > >(tee -a $EMAIL_LOG) 2> >(tee -a $EMAIL_LOG >&2)
+  fi
+}
+
+# }}}
+
+if ! "$HOME/.dotfiles/bin/email/email-status"; then
+  log "Email status is OFFLINE, syncing is disabled."
+  exit 0
+fi
+
+# Daily check {{{
+if $is_daily; then
+  log 'Running in daily mode'
+  last_sync=`cat $EMAIL_LAST`
+  now=`date +%s`
+  delta=$((($now-$last_sync)/3600))
+
+  log "Last sync was about $delta hours ago."
+
+  if [[ $delta -lt 11 ]]; then
+    log "Exit email-sync"
+    exit 1;
+  else
+    echo $now > $EMAIL_LAST
+  fi
+fi
+# }}}
+
+# Offlineimap command {{{
+
+# Syncing email command with offlineimap:
+#   -f just sync inbox folders to keep it fast
+#   -o run only once
+#   -u quiet to just log errors
+sync_email="offlineimap -o"
+
+if $is_fast; then
+  # If quiet:
+  #   -l log it to file
+  sync_email="$sync_email -f INBOX"
+fi
+
+if $is_quiet; then
+  # If quiet:
+  #   -l log it to file
+  sync_email="$sync_email -u quiet -l $EMAIL_LOG"
+fi
+# }}}
+
+# Connectivity checks {{{
+sync_email="$sync_email -a posteo,eiffel"
+
+# }}}
+
+# MSMTP {{{
+if ! $is_fast; then
+  if $is_quiet; then
+    (${send_email} >> $EMAIL_LOG 2>&1 ) &
+  else
+    (${send_email} > >(tee -a $EMAIL_LOG) 2> >(tee -a $EMAIL_LOG >&2) ) &
+  fi
+fi
+# }}}
+
+# Offlineimap {{{
+
+# Check if offlineimap is running:
+pid=$(pgrep -f offlineimap)
+if [[ ${pid} -gt 0 ]] ; then
+    log "Offlineimap is already running with pid ${pid}"
+    exit 1
+fi
+
+# If offlineimap is not running, then:
+exec ${sync_email} > >(tee -a $EMAIL_LOG) 2> >(tee -a $EMAIL_LOG >&2)
+
+# }}}

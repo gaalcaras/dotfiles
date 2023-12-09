@@ -1,0 +1,41 @@
+#! /bin/bash
+
+function save_date () {
+  date -d "$1" '+%Y-%m-%d-%H.%M.%S' > "$HOME/.msmtpqueue/SENDLATER"
+}
+
+clear
+PS3="Enter a number > "
+
+select when in "today at noon" "tonight" "tomorrow morning" "in 2 days" "next week"; do
+  case $when in
+    "today at noon")
+      save_date "today 12:00"
+      break
+      ;;
+
+    "tonight")
+      save_date "today 18:00"
+      break
+      ;;
+
+    "tomorrow morning")
+      save_date "tomorrow 08:00"
+      break
+      ;;
+
+    "in 2 days")
+      save_date "+2day 08:00"
+      break
+      ;;
+
+    "next week")
+      save_date "monday 08:00"
+      break
+      ;;
+
+    *)
+      echo "Invalid number, try again :("
+      ;;
+  esac
+done
