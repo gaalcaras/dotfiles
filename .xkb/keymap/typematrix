@@ -1,0 +1,8 @@
+default xkb_keymap "default" {
+  xkb_keycodes  { include "evdev+aliases(azerty)" };
+  xkb_types     { include "complete" };
+  xkb_compat    { include "complete" };
+  // Use the escape key as control + load custom symbols in ~/.xdb/symbols/hyper
+  xkb_symbols   { include "pc+fr(bepo)+inet(evdev)+hyper(tab)+tm(delesc)" };
+  xkb_geometry  { include "pc(pc105)" };
+};

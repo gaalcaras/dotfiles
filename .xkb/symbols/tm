@@ -1,0 +1,14 @@
+// To dump current xkb config : xkbcomp $DISPLAY output.xkb (use -i to get
+// keyboard specifics)
+// Use xev for keyboard events
+partial modifier_keys
+xkb_symbols "shiftctrl" {
+  // Swap Left Control and Left Shift
+  key <LFSH> { [ Control_L ] };
+  key <LCTL> { [ Shift_L ] };
+};
+
+xkb_symbols "delesc" {
+  // Map Delete to Escape
+  key <DELE> { [ Escape ] };
+};

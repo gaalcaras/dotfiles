@@ -1,0 +1,7 @@
+default xkb_keymap "default" {
+  xkb_keycodes  { include "evdev+aliases(azerty)" };
+  xkb_types     { include "complete" };
+  xkb_compat    { include "complete" };
+  xkb_symbols   { include "pc+fr(azerty)+inet(evdev)" };
+  xkb_geometry  { include "pc(pc105)" };
+};

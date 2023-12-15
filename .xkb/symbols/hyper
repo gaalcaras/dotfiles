@@ -1,0 +1,17 @@
+// To dump current xkb config : xkbcomp $DISPLAY output.xkb
+// Use xev for keyboard events
+partial modifier_keys
+xkb_symbols "tab" {
+  // Use Tab as Hyper_L
+  key <TAB> { [ Hyper_L, Hyper_L ] };
+
+  // Requirement for xcape to work: keep the Tab keycode somewhere
+  key <I254> { [ Tab, ISO_Left_Tab ] };
+
+  // Use w as Hyper_R
+  key <AD12> { [ Hyper_R, Hyper_R ]};
+
+  // Requirement for xcape to work: keep the w keycode somewhere
+  key <I255> { [ w, W ] };
+  key <I255> { [ w, W ] };
+};
