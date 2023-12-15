@@ -1,0 +1,32 @@
+[Added Associations]
+application/octet-stream=transmission-gtk.desktop;
+x-scheme-handler/http=qutebrowser.desktop;
+x-scheme-handler/https=qutebrowser.desktop;
+x-scheme-handler/ftp=qutebrowser.desktop;
+x-scheme-handler/chrome=qutebrowser.desktop;
+text/html=qutebrowser.desktop;
+application/x-extension-htm=qutebrowser.desktop;
+application/x-extension-html=qutebrowser.desktop;
+application/x-extension-shtml=qutebrowser.desktop;
+application/xhtml+xml=qutebrowser.desktop;
+application/x-extension-xhtml=qutebrowser.desktop;
+application/x-extension-xht=qutebrowser.desktop;
+x-scheme-handler/tg=userapp-Telegram Desktop-RJY4V0.desktop;userapp-Telegram Desktop-24OIW1.desktop;org.telegram.desktop.desktop;
+
+[Default Applications]
+applications/pdf=zathura.desktop
+application/pdf=zathura.desktop
+x-scheme-handler/http=qutebrowser.desktop
+x-scheme-handler/https=qutebrowser.desktop
+x-scheme-handler/ftp=qutebrowser.desktop
+x-scheme-handler/chrome=qutebrowser.desktop
+text/html=qutebrowser.desktop
+application/x-extension-htm=qutebrowser.desktop
+application/x-extension-html=qutebrowser.desktop
+application/x-extension-shtml=qutebrowser.desktop
+application/xhtml+xml=qutebrowser.desktop
+application/x-extension-xhtml=qutebrowser.desktop
+application/x-extension-xht=qutebrowser.desktop
+x-scheme-handler/about=qutebrowser.desktop
+x-scheme-handler/unknown=qutebrowser.desktop
+x-scheme-handler/tg=org.telegram.desktop.desktop
