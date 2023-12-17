@@ -172,7 +172,7 @@ bindsym $mod+space focus mode_toggle
 bindsym $mod+Shift+Tab scratchpad show
 
 # Rofi bindings
-bindsym $mod+d       exec ROFICOL=3 rofi -run-command "alacritty -t {cmd} -e sh -c '{cmd}'" -show run
+bindsym $mod+d       exec ROFICOL=3 rofi -run-command "alacritty -t {cmd} -e zsh -c '{cmd}'" -show run
 bindsym $mod+Shift+d exec ROFIACCENT=$aqua ROFICOL=3 rofi -show run
 
 bindsym $mod+Escape  exec ROFIACCENT=$red ROFICOL=2 $configdir/rofi/modules/rofi_power "i3"
