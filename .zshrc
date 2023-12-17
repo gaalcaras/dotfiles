@@ -1,5 +1,5 @@
 # ###############
-# Zsh config file
+# Zsh fig file
 # by @gaalcaras
 # ###############
 
@@ -214,6 +214,7 @@ alias ikhal='LC_TIME=C ikhal'
 # Tools
 alias bib="cd $BIB_DIR && $EDITOR $BIB_FILE"
 alias nv="nvim"
+alias nvimlua="NVIM_APPNAME=nvimlua nvim"
 alias mutt='hash tmuxifier 2>/dev/null && tmuxifier load-window mutt || neomutt -n' # Check if tmuxifier exists before loading mutt setup
 alias mr='mr -d "$HOME"' # Multi-repos with minimal output and 5 parallel jobs
 alias top='gtop'
@@ -243,7 +244,7 @@ alias muttrc="$EDITOR ~/.config/neomutt/muttrc"
 alias qutebrowserrc="$EDITOR ~/.config/qutebrowser/config.py"
 alias lfrc="$EDITOR ~/.config/lf/lfrc"
 alias rofirc="$EDITOR ~/.config/rofi/config.rasi"
-alias vimrc="$EDITOR ~/.config/nvim/init.vim"
+alias vimrc="$EDITOR ~/.vimrc"
 alias xinitrc="$EDITOR ~/.xinitrc"
 alias zathurarc="$EDITOR ~/.config/zathura/zathurarc"
 alias zshrc="$EDITOR ~/.zshrc"
