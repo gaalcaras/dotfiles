@@ -18,7 +18,7 @@ map c updir
 map r open
 map <enter> open
 
-cmd open $set -f; rifle -p 0 $fx
+cmd open $xdg-open "$fx"
 
 # Rename
 map R rename # at the very end
@@ -142,7 +142,7 @@ map me ${{
   lf -remote "send $id push :rename<space>$filename<a-b><c-b>"
 }}
 
-map .m ${{ ~/.dotfiles/bin/files/sendtobatkey "$fx" }}
+map .m ${{ ~/.local/bin/user/files/sendtobatkey "$fx" }}
 
 # Unmount disk
 map U ${{ umount "$fx" }}
