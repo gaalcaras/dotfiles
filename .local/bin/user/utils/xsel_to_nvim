@@ -1,0 +1,13 @@
+#!/bin/env bash
+
+# Get current desktop id
+DESKTOP=$(wmctrl -d | grep "*" | head -c1)
+
+# Get the filenames of nvim instances running in the current desktop
+WINDOW_PIDS=$(wmctrl -lpx | grep " $DESKTOP .* " | cut -d" " -f4)
+
+while IFS= read -r pid ; do
+  if nvim_do "$pid" ":call markdown#insertQuote()<cr>"; then
+    exit 0
+  fi
+done <<< "$WINDOW_PIDS"

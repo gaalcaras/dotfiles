@@ -49,7 +49,7 @@ log "Starting msmtp-runqueue..."
 log "$(find "$QUEUEDIR" -name "*.mail" -type f | wc -l) emails in queue"
 
 # Checking if sending emails is ok right now
-if ! "$HOME/.dotfiles/bin/email/email-status"; then
+if ! "$HOME/.local/bin/user/email/email-status"; then
   if $FORCE; then
     log "Force option detected, sending anyway"
   else

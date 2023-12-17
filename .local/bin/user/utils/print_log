@@ -1,0 +1,5 @@
+#!/bin/bash
+
+LEVEL=${2:-INFO}
+
+echo "$(date +"%Y-%m-%d %H:%M:%S") $LEVEL :: $1"

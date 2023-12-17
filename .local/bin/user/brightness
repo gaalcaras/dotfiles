@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Arguments :
+# 1 (mandatory) = brightness offset (e.g. 1)
+# 2 (optional) = color
+
+OFFSET="$1"
+
+if [[ "$OFFSET" -gt 0 ]]; then
+  LIGHT="light -A $OFFSET"
+else
+  LIGHT="light -U $((-$OFFSET))"
+fi
+
+if [[ -z "$2" ]]; then
+  # Color purple by default
+  COLOR="#8abeb7"
+else
+  COLOR="$2"
+fi
+
+eval "$LIGHT"
+notify-send \
+  -h "int:value:$(light -G)" \
+  -h "string:hlcolor:$COLOR" \
+  -h "string:fgcolor:$COLOR" \
+  -a " Brightness" "Update screen light"

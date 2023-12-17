@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+
+import argparse
+import requests
+import sys
+
+from subprocess import run
+
+def msg(msg, percent=0):
+    """Display messages to the user"""
+
+    args = ['notify-send', '-a', ' Translation via Deepl']
+
+    if percent > 0:
+        args.extend(['-h', f'int:value:{percent}'])
+
+    args.append(msg)
+
+    run(args, check=True)
+
+def translate_api(args):
+    """Send arguments to Deepl api and return Requests.response"""
+    params = {
+        "auth_key": args.key,
+        "target_lang": args.target,
+        "text": args.text,
+        "split_sentences": "nonewlines"
+    }
+
+    return requests.post("https://api-free.deepl.com/v2/translate", data=params)
+
+def check_api_usage(args):
+    """Check api usage"""
+    params = {
+        "auth_key": args.key
+    }
+
+    return requests.post("https://api-free.deepl.com/v2/usage", data=params)
+
+def api_call_successful(response, quiet=False):
+    """Figure out if the request to the api was successful"""
+
+    if response.status_code == 200:
+        return True
+    elif response.status_code == 403:
+        if not quiet:
+            msg('Could not log into Deepl API. Please provide a valid auth key.')
+        sys.exit(1)
+    else:
+        if not quiet:
+            msg(f'Request to Deepl API failed with error code {response.status_code}')
+        sys.exit(1)
+
+def process_api_usage(text, response):
+    """Process a successful api usage request"""
+    result = response.json()
+    ratio = round(result["character_count"]*100/result["character_limit"], 1)
+    msg(f'Translating "{text[0:20].strip()}...", API monthly usage at {ratio}%.', percent=ratio)
+
+def process_api_translation(response):
+    """Process a successful api translation request"""
+    result = response.json()
+    return(result['translations'][0]['text'])
+
+PARSER = argparse.ArgumentParser()
+
+PARSER.add_argument("text", type=str,
+                    help="text to translate")
+PARSER.add_argument("-t", "--target", default="EN",
+                    help="language to translate to (2 letter code)")
+PARSER.add_argument("-k", "--key", help="auth key to use api")
+
+ARGS = PARSER.parse_args()
+
+RESPONSE = check_api_usage(ARGS)
+
+if api_call_successful(RESPONSE):
+    process_api_usage(ARGS.text, RESPONSE)
+
+RESPONSE = translate_api(ARGS)
+
+if api_call_successful(RESPONSE, quiet=True):
+    print(process_api_translation(RESPONSE))

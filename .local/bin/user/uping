@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# ==========================================
+# Useful ping
+# ==========================================
+
+function log {
+    echo `date +"%Y-%m-%d %H:%M:%S"` "INFO: $1"
+}
+
+domain=$1
+
+log "Pinging $1..."
+
+# Exit if we're offline
+if ! ping -c1 $1 > /dev/null 2>&1; then
+    log "No ping from $1."
+    # But ping could be firewalled ...
+
+    # '-O -' will redirect the actual html to stdout and thus to /dev/null
+    if ! wget -O - $1 > /dev/null 2>&1; then
+        # Both test have failed
+        log "No website at $1."
+        exit 1;
+    fi
+fi
+
+log "$1 is up."
+log "Now testing packet loss..."
+
+packet_loss=$(ping -c 3 -q $1 | grep -oP '\d+(?=% packet loss)')
+
+if (($packet_loss > 20)); then
+    log "Packet loss is >20%... Try some other time perhaps?"
+    exit 1;
+fi
+
+log "Connection with $1 seems OK!"

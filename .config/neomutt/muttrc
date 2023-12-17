@@ -286,13 +286,13 @@ macro index,pager,attach w '<enter-command>source ~/.config/neomutt/colors<enter
 macro pager,attach,compose \Cl "<enter-command>unset wait\_key<enter><pipe-entry>urlscan -d<enter><enter-command>set wait\_key<enter>" 'Follow links with urlscan'
 
 # Save attachments
-macro index,pager X "<pipe-message>~/.dotfiles/bin/mutt/save_all_attachments.py<enter>" 'Save all attachments to proper directory structure'
+macro index,pager X "<pipe-message>~/.local/bin/user/mutt/save_all_attachments.py<enter>" 'Save all attachments to proper directory structure'
 # bind  attach S noop
 # macro attach S "<enter-command>unset wait\_key<enter><print-entry><enter-command>set wait\_key<enter>" 'Save attachment to dated directory'
 
 unbind editor <space>
 bind compose a noop
-macro compose a ":source ~/.dotfiles/bin/mutt/fzfattach|<enter>" 'Add attachment using fzf'
+macro compose a ":source ~/.local/bin/user/mutt/fzfattach|<enter>" 'Add attachment using fzf'
 macro compose <space>a '<attach-file>' 'Add attachment'
 
 # Send and sync emails

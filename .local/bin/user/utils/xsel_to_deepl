@@ -1,0 +1,15 @@
+#!/bin/env bash
+
+TARGET=${1:-EN}
+XSEL=$(xsel)
+
+TEXT=$(deepl -t "$TARGET" -k "$(pass show api/deepl)" "$XSEL")
+
+if [[ $? == 0 ]]; then
+  echo "$TEXT" | xclip -sel clip
+  MSG="Translation is successfully stored in clipboard"
+else
+  MSG="Translation failed"
+fi
+
+notify-send -a " Translate via Deepl" "$MSG"

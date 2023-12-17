@@ -16,14 +16,14 @@ EMAIL_LOG="$HOME/.email-syncing.log"
 EMAIL_LAST="$HOME/.email-last-sync.log"
 EMAIL_STATUS="$HOME/.local/share/email/status"
 
-print_log="$HOME/.dotfiles/bin/utils/print_log"
+print_log="$HOME/.local/bin/user/utils/print_log"
 
 is_quiet=false
 is_fast=false
 is_daily=false
 
-send_email="$HOME/.dotfiles/bin/email/msmtp-runqueue"
-uping="$HOME/.dotfiles/bin/uping"
+send_email="$HOME/.local/bin/user/email/msmtp-runqueue"
+uping="$HOME/.local/bin/user/uping"
 
 # Arguments {{{
 while [[ $# -gt 0 ]]
@@ -71,7 +71,7 @@ function check {
 
 # }}}
 
-if ! "$HOME/.dotfiles/bin/email/email-status"; then
+if ! "$HOME/.local/bin/user/email/email-status"; then
   log "Email status is OFFLINE, syncing is disabled."
   exit 0
 fi
